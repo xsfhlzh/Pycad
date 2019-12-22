@@ -1,0 +1,9 @@
+{
+  "version": "0.9.279.6",
+  "editor.class": "Chrome_WidgetWin_1",
+  "editor.name": "extensions - Visual Studio Code",
+  "editor.path": "C:\\Program Files\\Microsoft VS Code\\Code.exe",
+  "servers.tcp.maxlengthofdata": 1024,
+  "servers.wcf.console": "http://localhost/pycad/servers/console",
+  "servers.wcf.debug": "http://localhost/pycad/servers/debug"
+}

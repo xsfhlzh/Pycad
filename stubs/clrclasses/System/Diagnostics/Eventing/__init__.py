@@ -1,0 +1,4 @@
+import __clrclasses__.System.Diagnostics.Eventing.Reader as Reader
+from __clrclasses__.System.Diagnostics.Eventing import EventDescriptor
+from __clrclasses__.System.Diagnostics.Eventing import EventProvider
+from __clrclasses__.System.Diagnostics.Eventing import EventProviderTraceListener

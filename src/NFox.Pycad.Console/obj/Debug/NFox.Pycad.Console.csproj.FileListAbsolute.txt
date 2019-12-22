@@ -1,0 +1,17 @@
+D:\Pycad\Src\NFox.Pycad.Console\bin\Debug\NFox.Pycad.Console.exe.config
+D:\Pycad\Src\NFox.Pycad.Console\bin\Debug\NFox.Pycad.Console.exe
+D:\Pycad\Src\NFox.Pycad.Console\bin\Debug\NFox.Pycad.Console.pdb
+D:\Pycad\Support\pyco.exe.config
+D:\Pycad\Support\pyco.exe
+D:\Pycad\Support\pyco.pdb
+D:\Pycad\Projects\pyco.exe.config
+D:\Pycad\Projects\pyco.exe
+D:\Pycad\Projects\pyco.pdb
+D:\Pycad\Lib\pyconsole.exe
+D:\Pycad\Lib\pyconsole.pdb
+D:\Pycad\Plugins\pyconsole.exe
+D:\Pycad\Plugins\pyconsole.pdb
+D:\Pycad\Bin\pyconsole.exe
+D:\Pycad\Bin\pyconsole.pdb
+D:\Pycad\Src\NFox.Pycad.Console\obj\Debug\pyconsole.exe
+D:\Pycad\Src\NFox.Pycad.Console\obj\Debug\pyconsole.pdb

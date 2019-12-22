@@ -1,0 +1,149 @@
+from __clrclasses__.System import Array as _n_0_t_0
+from __clrclasses__.System import MarshalByRefObject as _n_0_t_1
+from __clrclasses__.System import Exception as _n_0_t_2
+from __clrclasses__.System import IAsyncResult as _n_0_t_3
+from __clrclasses__.System import Enum as _n_0_t_4
+from __clrclasses__.System import IComparable as _n_0_t_5
+from __clrclasses__.System import IFormattable as _n_0_t_6
+from __clrclasses__.System import IConvertible as _n_0_t_7
+from __clrclasses__.System.Collections import IDictionary as _n_1_t_0
+from __clrclasses__.System.Collections import IEnumerator as _n_1_t_1
+from __clrclasses__.System.Collections import IList as _n_1_t_2
+from __clrclasses__.System.IO import Stream as _n_2_t_0
+from __clrclasses__.System.Runtime.Remoting.Messaging import IMessageCtrl as _n_3_t_0
+from __clrclasses__.System.Runtime.Remoting.Messaging import IMessage as _n_3_t_1
+from __clrclasses__.System.Runtime.Remoting.Messaging import IMessageSink as _n_3_t_2
+import typing
+class BaseChannelObjectWithProperties(_n_1_t_0):
+    @property
+    def Properties(self) -> _n_1_t_0:"""Properties { get; } -> IDictionary"""
+class BaseChannelSinkWithProperties(BaseChannelObjectWithProperties, _n_1_t_0):
+    pass
+class BaseChannelWithProperties(BaseChannelObjectWithProperties, _n_1_t_0):
+    pass
+class ChannelDataStore(IChannelDataStore):
+    def __init__(self, channelURIs: _n_0_t_0[str]) -> ChannelDataStore:...
+class ChannelServices(object):
+    @property
+    def RegisteredChannels(self) -> _n_0_t_0[IChannel]:"""RegisteredChannels { get; } -> Array"""
+    @staticmethod
+    def AsyncDispatchMessage(msg: _n_3_t_1, replySink: _n_3_t_2) -> _n_3_t_0:...
+    @staticmethod
+    def CreateServerChannelSinkChain(provider: IServerChannelSinkProvider, channel: IChannelReceiver) -> IServerChannelSink:...
+    @staticmethod
+    def DispatchMessage(sinkStack: IServerChannelSinkStack, msg: _n_3_t_1, replyMsg: _n_3_t_1) -> ServerProcessing:...
+    @staticmethod
+    def GetChannel(name: str) -> IChannel:...
+    @staticmethod
+    def GetChannelSinkProperties(obj: object) -> _n_1_t_0:...
+    @staticmethod
+    def GetUrlsForObject(obj: _n_0_t_1) -> _n_0_t_0[str]:...
+    @staticmethod
+    def RegisterChannel(chnl: IChannel):...
+    @staticmethod
+    def RegisterChannel(chnl: IChannel, ensureSecurity: bool):...
+    @staticmethod
+    def SyncDispatchMessage(msg: _n_3_t_1) -> _n_3_t_1:...
+    @staticmethod
+    def UnregisterChannel(chnl: IChannel):...
+class ClientChannelSinkStack(IClientChannelSinkStack):
+    def __init__(self, replySink: _n_3_t_2) -> ClientChannelSinkStack:...
+    def __init__(self) -> ClientChannelSinkStack:...
+class IChannel():
+    @property
+    def ChannelName(self) -> str:"""ChannelName { get; } -> str"""
+    @property
+    def ChannelPriority(self) -> int:"""ChannelPriority { get; } -> int"""
+    def Parse(self, url: str, objectURI: str) -> str:...
+class IChannelDataStore():
+    @property
+    def ChannelUris(self) -> _n_0_t_0[str]:"""ChannelUris { get; } -> Array"""
+    @property
+    def Item(self) -> object:"""Item { get; set; } -> object"""
+class IChannelReceiver(IChannel):
+    @property
+    def ChannelData(self) -> object:"""ChannelData { get; } -> object"""
+    def GetUrlsForUri(self, objectURI: str) -> _n_0_t_0[str]:...
+    def StartListening(self, data: object):...
+    def StopListening(self, data: object):...
+class IChannelReceiverHook():
+    @property
+    def ChannelScheme(self) -> str:"""ChannelScheme { get; } -> str"""
+    @property
+    def ChannelSinkChain(self) -> IServerChannelSink:"""ChannelSinkChain { get; } -> IServerChannelSink"""
+    @property
+    def WantsToListen(self) -> bool:"""WantsToListen { get; } -> bool"""
+    def AddHookChannelUri(self, channelUri: str):...
+class IChannelSender(IChannel):
+    def CreateMessageSink(self, url: str, remoteChannelData: object, objectURI: str) -> _n_3_t_2:...
+class IChannelSinkBase():
+    @property
+    def Properties(self) -> _n_1_t_0:"""Properties { get; } -> IDictionary"""
+class IClientChannelSink(IChannelSinkBase):
+    @property
+    def NextChannelSink(self) -> IClientChannelSink:"""NextChannelSink { get; } -> IClientChannelSink"""
+    def AsyncProcessRequest(self, sinkStack: IClientChannelSinkStack, msg: _n_3_t_1, headers: ITransportHeaders, stream: _n_2_t_0):...
+    def AsyncProcessResponse(self, sinkStack: IClientResponseChannelSinkStack, state: object, headers: ITransportHeaders, stream: _n_2_t_0):...
+    def GetRequestStream(self, msg: _n_3_t_1, headers: ITransportHeaders) -> _n_2_t_0:...
+    def ProcessMessage(self, msg: _n_3_t_1, requestHeaders: ITransportHeaders, requestStream: _n_2_t_0, responseHeaders: ITransportHeaders, responseStream: _n_2_t_0):...
+class IClientChannelSinkProvider():
+    @property
+    def Next(self) -> IClientChannelSinkProvider:"""Next { get; set; } -> IClientChannelSinkProvider"""
+    def CreateSink(self, channel: IChannelSender, url: str, remoteChannelData: object) -> IClientChannelSink:...
+class IClientChannelSinkStack(IClientResponseChannelSinkStack):
+    def Pop(self, sink: IClientChannelSink) -> object:...
+    def Push(self, sink: IClientChannelSink, state: object):...
+class IClientFormatterSink(_n_3_t_2, IClientChannelSink):
+    pass
+class IClientFormatterSinkProvider(IClientChannelSinkProvider):
+    pass
+class IClientResponseChannelSinkStack():
+    def AsyncProcessResponse(self, headers: ITransportHeaders, stream: _n_2_t_0):...
+    def DispatchException(self, e: _n_0_t_2):...
+    def DispatchReplyMessage(self, msg: _n_3_t_1):...
+class ISecurableChannel():
+    @property
+    def IsSecured(self) -> bool:"""IsSecured { get; set; } -> bool"""
+class IServerChannelSink(IChannelSinkBase):
+    @property
+    def NextChannelSink(self) -> IServerChannelSink:"""NextChannelSink { get; } -> IServerChannelSink"""
+    def AsyncProcessResponse(self, sinkStack: IServerResponseChannelSinkStack, state: object, msg: _n_3_t_1, headers: ITransportHeaders, stream: _n_2_t_0):...
+    def GetResponseStream(self, sinkStack: IServerResponseChannelSinkStack, state: object, msg: _n_3_t_1, headers: ITransportHeaders) -> _n_2_t_0:...
+    def ProcessMessage(self, sinkStack: IServerChannelSinkStack, requestMsg: _n_3_t_1, requestHeaders: ITransportHeaders, requestStream: _n_2_t_0, responseMsg: _n_3_t_1, responseHeaders: ITransportHeaders, responseStream: _n_2_t_0) -> ServerProcessing:...
+class IServerChannelSinkProvider():
+    @property
+    def Next(self) -> IServerChannelSinkProvider:"""Next { get; set; } -> IServerChannelSinkProvider"""
+    def CreateSink(self, channel: IChannelReceiver) -> IServerChannelSink:...
+    def GetChannelData(self, channelData: IChannelDataStore):...
+class IServerChannelSinkStack(IServerResponseChannelSinkStack):
+    def Pop(self, sink: IServerChannelSink) -> object:...
+    def Push(self, sink: IServerChannelSink, state: object):...
+    def ServerCallback(self, ar: _n_0_t_3):...
+    def Store(self, sink: IServerChannelSink, state: object):...
+    def StoreAndDispatch(self, sink: IServerChannelSink, state: object):...
+class IServerFormatterSinkProvider(IServerChannelSinkProvider):
+    pass
+class IServerResponseChannelSinkStack():
+    def AsyncProcessResponse(self, msg: _n_3_t_1, headers: ITransportHeaders, stream: _n_2_t_0):...
+    def GetResponseStream(self, msg: _n_3_t_1, headers: ITransportHeaders) -> _n_2_t_0:...
+class ITransportHeaders():
+    @property
+    def Item(self) -> object:"""Item { get; set; } -> object"""
+    def GetEnumerator(self) -> _n_1_t_1:...
+class ServerChannelSinkStack(IServerChannelSinkStack):
+    def __init__(self) -> ServerChannelSinkStack:...
+class ServerProcessing(_n_0_t_4, _n_0_t_5, _n_0_t_6, _n_0_t_7):
+    Async: int
+    Complete: int
+    OneWay: int
+    value__: int
+class SinkProviderData(object):
+    @property
+    def Children(self) -> _n_1_t_2:"""Children { get; } -> IList"""
+    @property
+    def Name(self) -> str:"""Name { get; } -> str"""
+    @property
+    def Properties(self) -> _n_1_t_0:"""Properties { get; } -> IDictionary"""
+    def __init__(self, name: str) -> SinkProviderData:...
+class TransportHeaders(ITransportHeaders):
+    def __init__(self) -> TransportHeaders:...

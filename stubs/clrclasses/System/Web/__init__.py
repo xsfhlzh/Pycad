@@ -1,0 +1,3 @@
+from __clrclasses__.System.Web import AspNetHostingPermission
+from __clrclasses__.System.Web import AspNetHostingPermissionAttribute
+from __clrclasses__.System.Web import AspNetHostingPermissionLevel

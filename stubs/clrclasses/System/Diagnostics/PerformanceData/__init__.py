@@ -1,0 +1,6 @@
+from __clrclasses__.System.Diagnostics.PerformanceData import CounterData
+from __clrclasses__.System.Diagnostics.PerformanceData import CounterSet
+from __clrclasses__.System.Diagnostics.PerformanceData import CounterSetInstance
+from __clrclasses__.System.Diagnostics.PerformanceData import CounterSetInstanceCounterDataSet
+from __clrclasses__.System.Diagnostics.PerformanceData import CounterSetInstanceType
+from __clrclasses__.System.Diagnostics.PerformanceData import CounterType

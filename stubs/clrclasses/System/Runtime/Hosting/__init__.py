@@ -1,0 +1,2 @@
+from __clrclasses__.System.Runtime.Hosting import ActivationArguments
+from __clrclasses__.System.Runtime.Hosting import ApplicationActivator

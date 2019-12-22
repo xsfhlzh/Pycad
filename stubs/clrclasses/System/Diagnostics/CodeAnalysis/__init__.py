@@ -1,0 +1,2 @@
+from __clrclasses__.System.Diagnostics.CodeAnalysis import ExcludeFromCodeCoverageAttribute
+from __clrclasses__.System.Diagnostics.CodeAnalysis import SuppressMessageAttribute

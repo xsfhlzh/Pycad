@@ -1,0 +1,2 @@
+from __clrclasses__.System.Deployment.Internal import InternalActivationContextHelper
+from __clrclasses__.System.Deployment.Internal import InternalApplicationIdentityHelper

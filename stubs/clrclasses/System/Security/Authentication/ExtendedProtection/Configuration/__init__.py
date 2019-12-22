@@ -1,0 +1,3 @@
+from __clrclasses__.System.Security.Authentication.ExtendedProtection.Configuration import ExtendedProtectionPolicyElement
+from __clrclasses__.System.Security.Authentication.ExtendedProtection.Configuration import ServiceNameElement
+from __clrclasses__.System.Security.Authentication.ExtendedProtection.Configuration import ServiceNameElementCollection

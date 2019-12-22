@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Root>
+  <File Name="NFox.Pycad.dll" />
+  <File Name="NFox.Pycad.Acad.dll" />
+  <File Name="NFox.Pycad.Gcad.dll" />
+  <Directory Name="bin">
+    <File Name="Microsoft.Dynamic.dll" />
+    <File Name="Microsoft.Scripting.dll" />
+    <File Name="IronPython.dll" />
+    <File Name="IronPython.Modules.dll" />
+    <File Name="IronPython.SQLite.dll" />
+    <File Name="IronPython.Wpf.dll" />
+    <File Name="Lib.zip" />
+    <File Name="Newtonsoft.Json.dll" />
+    <File Name="NFox.Pycad.Runtime.dll" />
+    <File Name="package.xml" />
+    <File Name="settings.json" />
+  </Directory>
+  <Directory Name="plugins">
+    <Plugin Name="NFox.Pycad.Update" />
+    <Plugin Name="NFox.Pycad.Core" />
+  </Directory>
+  <Directory Name="support">
+    <File Name="pycad" Build='True'/>
+  </Directory>
+  <Directory Name="extensions" />
+  <Directory Name="temp" />
+  <Directory Name="update">
+    <Directory Name="extensions" />
+  </Directory>
+</Root>

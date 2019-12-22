@@ -1,0 +1,7 @@
+D:\NFoxLite\NFox.PyLoader.dll
+D:\NFoxLite\NFox.PyLoader.pdb
+D:\NFox\Src\PyLoader\obj\Debug\NFox.PyLoader.dll
+D:\NFox\Src\PyLoader\obj\Debug\NFox.PyLoader.pdb
+D:\NFox\Src\PyLoader\obj\Debug\NFox.PyLoader.csprojResolveAssemblyReference.cache
+D:\NFox\Src\NFox.Pyloader\obj\Debug\NFox.PyLoader.dll
+D:\NFox\Src\NFox.Pyloader\obj\Debug\NFox.PyLoader.pdb

@@ -1,0 +1,3 @@
+from __clrclasses__.System.Runtime.ExceptionServices import ExceptionDispatchInfo
+from __clrclasses__.System.Runtime.ExceptionServices import FirstChanceExceptionEventArgs
+from __clrclasses__.System.Runtime.ExceptionServices import HandleProcessCorruptedStateExceptionsAttribute

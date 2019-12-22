@@ -1,0 +1,3 @@
+from __clrclasses__.System.Configuration.Assemblies import AssemblyHash
+from __clrclasses__.System.Configuration.Assemblies import AssemblyHashAlgorithm
+from __clrclasses__.System.Configuration.Assemblies import AssemblyVersionCompatibility

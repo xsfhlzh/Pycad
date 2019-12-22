@@ -1,0 +1,1 @@
+from __clrclasses__.System.Windows.Markup import ValueSerializerAttribute

@@ -1,0 +1,278 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{42DFB2F8-1BDA-4072-AEBE-56FA02800CBA}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>NFox.Expression</RootNamespace>
+    <AssemblyName>NFox.Expression</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\Support\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>
+    </DocumentationFile>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Scripting, Version=1.2.0.0, Culture=neutral, PublicKeyToken=7f709c5b713576e1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Bin\Microsoft.Scripting.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="UIAutomationProvider" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="WindowsFormsIntegration" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DataSystem\ConfigDictionary.cs" />
+    <Compile Include="Geometry\Image.cs" />
+    <Compile Include="Runtime\frmMakeGeneralPart.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Runtime\frmMakeGeneralPart.Designer.cs">
+      <DependentUpon>frmMakeGeneralPart.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Runtime\frmMakeParameterizedPart.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Runtime\frmMakeParameterizedPart.Designer.cs">
+      <DependentUpon>frmMakeParameterizedPart.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Runtime\frmPartPropertyList.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Runtime\frmPartPropertyList.Designer.cs">
+      <DependentUpon>frmPartPropertyList.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DataSystem\SimpleDictionary.cs" />
+    <Compile Include="DataSystem\SortedList.cs" />
+    <Compile Include="DataSystem\SymbolIndex.cs" />
+    <Compile Include="DataSystem\FunctionTable.cs" />
+    <Compile Include="DataSystem\ZipUtils.cs" />
+    <Compile Include="Runtime\Image2D.cs" />
+    <Compile Include="Runtime\frmInputBox.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Runtime\frmInputBox.Designer.cs">
+      <DependentUpon>frmInputBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DataSystem\ImagePartTable.cs" />
+    <Compile Include="SymbolValues\ConfigItem.cs" />
+    <Compile Include="SymbolValues\ISymbolValue.cs" />
+    <Compile Include="Runtime\OdxListView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Runtime\OdxListView.designer.cs">
+      <DependentUpon>OdxListView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Geometry\Angle.cs" />
+    <Compile Include="Geometry\BulgeVertex2D.cs" />
+    <Compile Include="Geometry\Ellipse2D.cs" />
+    <Compile Include="Runtime\Application.cs" />
+    <Compile Include="Runtime\PartInfo.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Runtime\PartInfo.Designer.cs">
+      <DependentUpon>PartInfo.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SymbolValues\Function.cs" />
+    <Compile Include="Geometry\HatchLoop.cs" />
+    <Compile Include="Geometry\KnotCollection.cs" />
+    <Compile Include="Geometry\NurbsData.cs" />
+    <Compile Include="Geometry\PolyLine2D.cs" />
+    <Compile Include="Geometry\Spline2D.cs" />
+    <Compile Include="Geometry\Text2D.cs" />
+    <Compile Include="Geometry\GeoUtils.cs" />
+    <Compile Include="Geometry\CircleArc2D.cs" />
+    <Compile Include="Geometry\Curve2D.cs" />
+    <Compile Include="Geometry\Entity2D.cs" />
+    <Compile Include="Geometry\LineSegment2D.cs" />
+    <Compile Include="Geometry\Matrix2D.cs" />
+    <Compile Include="Geometry\Point2D.cs" />
+    <Compile Include="Geometry\Rectangle2D.cs" />
+    <Compile Include="Geometry\Vector2D.cs" />
+    <Compile Include="Runtime\OdxView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Runtime\OdxView.Designer.cs">
+      <DependentUpon>OdxView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Geometry\IEntityProvider.cs" />
+    <Compile Include="SymbolValues\PartAttrib.cs" />
+    <Compile Include="DataSystem\Database.cs" />
+    <Compile Include="Runtime\frmAttributeListView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Runtime\frmAttributeListView.Designer.cs">
+      <DependentUpon>frmAttributeListView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Runtime\frmEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Runtime\frmEdit.Designer.cs">
+      <DependentUpon>frmEdit.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Runtime\frmSelectTemplate.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Runtime\frmSelectTemplate.Designer.cs">
+      <DependentUpon>frmSelectTemplate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SymbolValues\ImagePart.cs" />
+    <Compile Include="Runtime\ParamBox.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Runtime\ParamBox.Designer.cs">
+      <DependentUpon>ParamBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SymbolValues\ParameterizedPart.cs" />
+    <Compile Include="Runtime\ParamList.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Runtime\ParamList.Designer.cs">
+      <DependentUpon>ParamList.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SymbolValues\Part.cs" />
+    <Compile Include="Runtime\PartCode.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Runtime\PartCode.Designer.cs">
+      <DependentUpon>PartCode.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SymbolValues\PartFolder.cs" />
+    <Compile Include="Runtime\PartListView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Runtime\PartListView.Designer.cs">
+      <DependentUpon>PartListView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SymbolValues\PartNode.cs" />
+    <Compile Include="Runtime\PartPropertyList.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Runtime\PartPropertyList.Designer.cs">
+      <DependentUpon>PartPropertyList.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DataSystem\SymbolDictionary.cs" />
+    <Compile Include="DataSystem\SymbolTable.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="DataSystem\IParser.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Runtime\frmInputBox.resx">
+      <DependentUpon>frmInputBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Runtime\frmMakeGeneralPart.resx">
+      <DependentUpon>frmMakeGeneralPart.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Runtime\frmMakeParameterizedPart.resx">
+      <DependentUpon>frmMakeParameterizedPart.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Runtime\frmPartPropertyList.resx">
+      <DependentUpon>frmPartPropertyList.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Runtime\OdxListView.resx">
+      <DependentUpon>OdxListView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Runtime\OdxView.resx">
+      <DependentUpon>OdxView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Runtime\frmAttributeListView.resx">
+      <DependentUpon>frmAttributeListView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Runtime\frmEdit.resx">
+      <DependentUpon>frmEdit.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Runtime\frmSelectTemplate.resx">
+      <DependentUpon>frmSelectTemplate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Runtime\ParamBox.resx">
+      <DependentUpon>ParamBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Runtime\ParamList.resx">
+      <DependentUpon>ParamList.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Runtime\PartCode.resx">
+      <DependentUpon>PartCode.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Runtime\PartInfo.resx">
+      <DependentUpon>PartInfo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Runtime\PartListView.resx">
+      <DependentUpon>PartListView.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Runtime\PartPropertyList.resx">
+      <DependentUpon>PartPropertyList.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Runtime\tree1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Runtime\tree0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NFox.Pycad.Runtime\NFox.Pycad.Runtime.csproj">
+      <Project>{5e7b26b7-f086-416d-b310-5302c5bea18f}</Project>
+      <Name>NFox.Pycad.Runtime</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

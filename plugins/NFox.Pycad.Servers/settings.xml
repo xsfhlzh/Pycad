@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Config Name="NFox.Pycad.Servers">
+  <Parent Value="NFox.Pycad.Core" />
+</Config>

@@ -1,0 +1,5 @@
+D:\Pycad\Bin\NFox.Pycad.Runtime.dll
+D:\Pycad\Bin\NFox.Pycad.Runtime.pdb
+D:\Pycad\Src\NFox.Pycad.Runtime\obj\Debug\NFox.Pycad.Runtime.dll
+D:\Pycad\Src\NFox.Pycad.Runtime\obj\Debug\NFox.Pycad.Runtime.pdb
+D:\Pycad\src\NFox.Pycad.Runtime\obj\Debug\NFox.Pycad.Runtime.csprojResolveAssemblyReference.cache

@@ -1,0 +1,6 @@
+from __clrclasses__.System.Collections.ObjectModel import Collection
+from __clrclasses__.System.Collections.ObjectModel import KeyedCollection
+from __clrclasses__.System.Collections.ObjectModel import ObservableCollection
+from __clrclasses__.System.Collections.ObjectModel import ReadOnlyCollection
+from __clrclasses__.System.Collections.ObjectModel import ReadOnlyDictionary
+from __clrclasses__.System.Collections.ObjectModel import ReadOnlyObservableCollection

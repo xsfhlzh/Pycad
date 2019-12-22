@@ -1,0 +1,15 @@
+D:\NFox\Lib\NFox.Pycad.Root.dll
+D:\NFox\Lib\NFox.Pycad.Root.pdb
+D:\NFox\Src\NFox.Dynamic\obj\Debug\NFox.Pycad.Root.dll
+D:\NFox\Src\NFox.Dynamic\obj\Debug\NFox.Pycad.Root.pdb
+D:\NFox\Src\NFox.Pycad.Root\obj\Debug\NFox.Pycad.Root.dll
+D:\NFox\Src\NFox.Pycad.Root\obj\Debug\NFox.Pycad.Root.pdb
+D:\Pycad\Lib\NFox.Pycad.Root.dll
+D:\Pycad\Lib\NFox.Pycad.Root.pdb
+D:\Pycad\Src\NFox.Pycad.Root\obj\Debug\NFox.Pycad.Root.dll
+D:\Pycad\Src\NFox.Pycad.Root\obj\Debug\NFox.Pycad.Root.pdb
+D:\Pycad\Plugins\NFox.Pycad.Root.dll
+D:\Pycad\Plugins\NFox.Pycad.Root.pdb
+D:\Pycad\Bin\NFox.Pycad.Root.dll
+D:\Pycad\Bin\NFox.Pycad.Root.pdb
+D:\Pycad\Src\NFox.Pycad.Root\obj\Debug\NFox.Pycad.Root.csprojResolveAssemblyReference.cache
