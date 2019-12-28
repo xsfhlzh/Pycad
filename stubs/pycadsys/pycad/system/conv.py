@@ -19,13 +19,11 @@ def BuildFilter(*lst: __typing.Iterable) -> __aced.SelectionFilter:
     """
     创建选择集过滤器
 
-    BuildFilter((0, 'line'),) -> ((0, 'line'),)
+    (0, 'line'), (8, '0') -> ((0, 'line'), (8, '0'))
 
-    BuildFilter((0, 'line'), (8, '0')) -> ((0, 'line'), (8, '0'))
+    (conv.Not, 0, 'line'), -> ((-4, '<not')(0, 'line'), (-4, 'not>'))
 
-    BuildFilter((conv.Not, 0, 'line'),) -> ((-4, '<not')(0, 'line'), (-4, 'not>'))
-    
-    BuildFilter((10, [">,>,*", acge.Point3d(), "<,<,*", acge.Point3d(10,10,0)]),) -> ((-4, '>,>,*'), (10, (0,0,0)), (-4, '<,<,*'), (10, (10,10,0)))
+    (10, [">,>,*", acge.Point3d(), "<,<,*", acge.Point3d(10,10,0)]) -> ((-4, '>,>,*'), (10, (0,0,0)), (-4, '<,<,*'), (10, (10,10,0)))
     """
 def ToSafeArray(objs: __typing.Iterable) -> __typing.Iterable:
     """

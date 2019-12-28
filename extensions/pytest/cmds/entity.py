@@ -135,9 +135,9 @@ def myline2(doc):
             n = len(pts)
             if n == 0:
                 #获取起点
-                respt1 = ed.GetPoint('\n指定第一个点:')
-                if respt1.Status != aced.PromptStatus.OK: return
-                pts.append(respt1.Value)
+                respt = edx.getpoint('\n指定第一个点:')
+                if not respt.ok(): return
+                pts.append(respt.value)
             else:
                 if n > 2:
                     opts = aced.PromptPointOptions(
@@ -150,26 +150,25 @@ def myline2(doc):
                 opts.BasePoint = pts[-1]
                 opts.UseBasePoint = True
                 opts.UseDashedLine = False
-                respt2 = ed.GetPoint(opts)
-                if respt2.Status == aced.PromptStatus.OK:
-                    pt = respt2.Value
+                respt = edx.getpoint(opts)
+                if respt.ok():
+                    pt = respt.value
                     if n > 0:
                         line = acdb.Line(pts[-1], pt)
                         tr.addentity(btr, line)
                         tr.flush(line)
                         lines.append(line)
                         pts.append(pt)
-                elif respt2.Status == aced.PromptStatus.Keyword:
-                    if respt2.StringResult == 'C':
-                        line = acdb.Line(pts[-1], pts[0])
-                        tr.addentity(btr, line)
-                        break
-                    else:
-                        del pts[-1]
-                        if n > 1:
-                            lines[-1].Erase()
-                            tr.flush(line)
-                            del lines[-1]
+                elif respt.keyword('C'):
+                    line = acdb.Line(pts[-1], pts[0])
+                    tr.addentity(btr, line)
+                    break
+                elif respt.keyword('U'):
+                    del pts[-1]
+                    if n > 1:
+                        lines[-1].Erase()
+                        tr.flush(line)
+                        del lines[-1]
                 else: break
 
 @command()
@@ -180,8 +179,7 @@ def mypl3d(doc):
     res = edx.entsel(opts)
     if not res.ok(): return
     with dbtrans(doc, False) as tr:
-        pl = tr.getobject(res[0])
-        print('')
+        pl = tr.getobject(res.ObjectId)
         for i in pl:
             print(tr.getobject(i).Position)
 

@@ -80,7 +80,6 @@ namespace NFox.Pycad.Core
                 //从acad.py中获取初始化信息
                 //Engine.Instance.TryReference("pycad.dll");
                 Engine.Instance.Execute($"from pycad.acad import *");
-
             }
             catch (Exception ex)
             {

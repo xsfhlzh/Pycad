@@ -4,13 +4,13 @@
 
 __all__ = [
     'conv', 'acapp', 'acdoc', 'guid', 'stdio', 'pye',
-    'lisp', 'command', 'panel', 'showtime',
+    'lisp', 'command', 'panel', 'vcm','showtime',
     'help', 'switch', 'flatten']
 
-from .mgdnss import *
-from .wraps import *
-from .decorators import *
-from . import conv
+from pycad.system.mgdnss import *
+from pycad.system.wraps import *
+from pycad.system.decorators import *
+from pycad.system import conv
 
 from NFox.Pycad.Core.Modules import pye, io
 
@@ -34,7 +34,7 @@ def pyrun(doc):
     pfo = aced.PromptOpenFileOptions("选择Python脚本")
     pfo.Filter = "Python脚本文件(*.py)|*.py"
     pfo.PreferCommandLine = acapp.GetSystemVariable("FILEDIA") == 0
-    pfo.InitialDirectory = pye.mainpath + "\\Projects\\scripts\\"
+    pfo.InitialDirectory = pye.extensionspath + "\\scripts\\"
     global _filename
     pfo.InitialFileName = _filename
     pr = doc.Editor.GetFileNameForOpen(pfo)
@@ -42,8 +42,7 @@ def pyrun(doc):
         try:
             pye.executefile(pr.StringResult)
             _filename = pr.StringResult.rsplit('\\',1)[1]
-        except:
-            pass
+        except: pass
 
 @command()
 def pyinstall(doc):

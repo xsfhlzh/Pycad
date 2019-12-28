@@ -1,17 +1,20 @@
-﻿
+﻿from pycad.system.mgdnss import *
+
+acapp = hasattr(acap, 'Application') and acap.Application or acap.Core.Application
+
 class acdoc(object):
     def __init__(self, lock = True):
-        from . import acapp, io
+        from pycad.system import stdio
         self.doc = acapp.DocumentManager.MdiActiveDocument
-        self.ed, io.instance.ed = io.instance.ed, self.doc.Editor
+        self.ed, stdio.ed = stdio.ed, self.doc.Editor
         self.lock = lock
         if self.lock:
             self.doclock = self.doc.LockDocument()
     def __enter__(self):
         return self.doc
     def __exit__(self, t, v, b):
-        from . import io
-        io.instance.ed = self.ed
+        from pycad.system import stdio
+        stdio.ed = self.ed
         if self.lock:
             self.doclock.Dispose()
 
@@ -35,7 +38,6 @@ class lisp(object):
             self.func = args
             return self
         else:
-            from . import acdoc
             with acdoc(self.lock) as doc:
                 from pycad.system import conv
                 return conv.ToLispData(self.func(doc, conv.FromLispData(args)))
@@ -63,7 +65,6 @@ class command(object):
             self.func = args
             return self
         else:
-            from . import acdoc
             with acdoc(self.lock) as doc:
                 self.func(doc)
 
@@ -71,7 +72,7 @@ class panel(object):
     """
     面板装饰器(类装饰器)
 
-    panel(name = None, flags = 0): -> panel
+    panel(name = None, flags = 0) -> panel
 
     name: 命令名，默认为py类名
 
@@ -86,7 +87,6 @@ class panel(object):
             self.cls = cls
             if not self.name:
                 self.name = cls.__name__
-            from pycad.system import acws
             self._checkattr('dock', acws.DockSides.None)
             self._checkattr('dockenable', acws.DockSides.None | acws.DockSides.Left | acws.DockSides.Right | acws.DockSides.Top | acws.DockSides.Bottom)
             self._checkattr('text', self.cls.__name__)
@@ -106,7 +106,7 @@ class panel(object):
                         for key, value in 
                         self.cls.itemtypes.items()}
                     self.obj = self.cls(doc, self.tabs)
-                    from pycad.system import acws, guid
+                    from pycad.system import guid
                     self.ps = acws.PaletteSet(self.cls.text, self.name, guid(self.cls.guid))
                     self.ps.Style = self.cls.style
                     self.ps.DockEnabled = self.cls.dockenable
@@ -121,6 +121,67 @@ class panel(object):
     def _checkattr(self, name, value):
         if not hasattr(self.cls, name):
             setattr(self.cls, name, value)
+
+class vcm(object):
+    """
+    版本控制装饰器(函数装饰器)
+
+    vcm.default -> vcm
+    
+    vcm.apply(appname, ver = -1) -> vcm
+    """
+    from NFox.Pycad.Core.Application import (
+        HostAppName as curr_appname,
+        CurrSystem as curr_system)
+    curr_version = float('%s.%s' % (acapp.Version.Major, acapp.Version.Minor))
+    modules = {}
+    def __init__(self):
+        self.apps = {}
+    def __get__(self, obj, type=None):
+        self.obj = obj
+        return self
+    def __call__(self, *args, **kwags):
+        ver, funcs = None, None
+        if vcm.curr_appname in self.apps:
+            funcs = self.apps[vcm.curr_appname]
+        elif vcm.curr_system in self.apps:
+            funcs = self.apps[vcm.curr_system]
+        elif "default" in self.apps:
+            funcs = self.apps["default"]
+        if funcs:
+            for key in sorted(funcs):
+                if vcm.curr_version >= key: ver = key
+                else: break
+            if ver:
+                if hasattr(self, "obj"):
+                    return funcs[ver](self.obj, *args, **kwags)
+                else:
+                    return funcs[ver](*args, **kwags)
+    @staticmethod
+    def default(func):
+        return vcm._verfactory("default", -1)(func)
+    @staticmethod
+    def apply(appname, ver = -1):
+        return vcm._verfactory(appname, ver)
+
+    class _verfactory(object):
+        def __init__(self, appname, ver):
+            self.appname = appname
+            self.ver = ver
+        def __call__(self, func):
+            import inspect
+            modulename = inspect.getmodule(func).__name__
+            if modulename not in vcm.modules:
+                vcm.modules[modulename] = {}
+            vers = vcm.modules[modulename]
+            funcname = func.__name__
+            if funcname not in vers:
+                vers[funcname] = vcm()
+            hver = vers[funcname]
+            if self.appname not in hver.apps:
+                hver.apps[self.appname] = {}
+            hver.apps[self.appname][self.ver] = func
+            return hver
 
 def showtime(func):
     from functools import wraps

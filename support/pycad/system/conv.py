@@ -13,7 +13,7 @@ Not2 = "not"
 Xor = "^"
 Xor2 = "xor"
 
-from .mgdnss import *
+from pycad.system.mgdnss import *
 
 def BuildFilter(*lst):
     from NFox.Pycad.Core.Filters import OpFilter
@@ -28,8 +28,6 @@ def ToPoint3dCol(pts):
         points.Add(pt)
     return points
 
-
-
 def ToSafeArray(objs):
     import clr
     clr.AddReference('stdole')
@@ -42,7 +40,7 @@ def ToList(rb):
     except: return []
 
 def ToTuple(lst):
-    return tuple((_newvalue(*v) for v in lst))
+    return tuple(_newvalue(*v) for v in lst)
 
 def ToBuffer(lst):
     try: return acdb.ResultBuffer(ToTuple(lst))

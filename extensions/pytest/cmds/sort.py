@@ -1,7 +1,7 @@
 ﻿from pycad.system import *
 from pycad.runtime import *
-from random import uniform
 
+from random import uniform
 pts = [acge.Point3d(uniform(0, 100), uniform(0, 100), 0) for i in range(10000)]
 
 @command()
@@ -19,4 +19,8 @@ def linqsort(doc):
     #linq排序,先按X排序,X相同的再按Y排序
     import clr, System
     clr.ImportExtensions(System.Linq)
-    q = pts.Cast[acge.Point3d]().OrderBy(lambda p: p.X).ThenBy(lambda p: p.Y)
+    q = (
+    pts.Cast[acge.Point3d]()
+    .OrderBy(lambda p: p.X)
+    .ThenBy(lambda p: p.Y))
+    print(q)

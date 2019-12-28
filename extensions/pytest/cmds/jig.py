@@ -35,11 +35,11 @@ class cirjig(aced.EntityJig):
     def Sampler(self, prompts):
         if self.it == 0:
             opts = aced.JigPromptPointOptions('\n请输入圆心:')
-            opts.UserInputControls = \
-                aced.UserInputControls.Accept3dCoordinates | \
-                aced.UserInputControls.NoZeroResponseAccepted | \
-                aced.UserInputControls.NoNegativeResponseAccepted | \
-                aced.UserInputControls.NullResponseAccepted
+            opts.UserInputControls = (
+                aced.UserInputControls.Accept3dCoordinates |
+                aced.UserInputControls.NoZeroResponseAccepted |
+                aced.UserInputControls.NoNegativeResponseAccepted |
+                aced.UserInputControls.NullResponseAccepted)
             res = prompts.AcquirePoint(opts)
             if res.Status == aced.PromptStatus.OK:
                 if self.center == res.Value:
@@ -50,11 +50,11 @@ class cirjig(aced.EntityJig):
             return aced.SamplerStatus.Cancel
         elif self.it == 1:
             opts = aced.JigPromptDistanceOptions('\n请输入半径:')
-            opts.UserInputControls = \
-                aced.UserInputControls.Accept3dCoordinates | \
-                aced.UserInputControls.NoZeroResponseAccepted | \
-                aced.UserInputControls.NoNegativeResponseAccepted | \
-                aced.UserInputControls.NullResponseAccepted
+            opts.UserInputControls = (
+                aced.UserInputControls.Accept3dCoordinates |
+                aced.UserInputControls.NoZeroResponseAccepted |
+                aced.UserInputControls.NoNegativeResponseAccepted |
+                aced.UserInputControls.NullResponseAccepted)
             opts.UseBasePoint = True
             opts.BasePoint = self.center
             opts.Cursor = aced.CursorType.RubberBand

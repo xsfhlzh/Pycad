@@ -2,19 +2,15 @@ from pycad.system import *
 import typing
 
 class dbtrans:
-    """
-    事务简化类(上下文管理器) write by xsfhlzh
-
-    dbtrans(owner: typing.Union[acap.Document, acdb.Database, str] = None, commit: bool = True)
-
-    创建数据库事务，默认提交
-
-    owner: acap.Document or acdb.Database or str, 文档或数据库实例或dwg文件名, 默认创建空的数据库
-
-    commit: bool, 指定提交方式, 默认提交
-    """
-
     def __init__(self, owner: typing.Union[acap.Document, acdb.Database, str], commit: bool):
+        """
+        事务简化类(上下文管理器) write by xsfhlzh
+        
+        创建数据库事务，默认提交
+
+            owner: 文档或数据库实例或dwg文件名, 默认创建空的数据库
+            commit: 指定提交方式, 默认提交
+        """
         self.Document: acap.Document
         self.Database: acdb.Database
         self.Trans: acdb.Transaction

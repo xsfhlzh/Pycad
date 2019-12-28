@@ -12,11 +12,11 @@ def linqtest(doc):
     if not ss.ok(): return
     with dbtrans(doc) as tr:
         #流程:按圆心分组->每组排序后->跳过第一个元素
-        cirs = \
-            ss.Cast[acdb.ObjectId]()\
-            .Select(lambda i: tr.getobject(i))\
-            .GroupBy(lambda c: c.Center)\
-            .SelectMany(lambda cs: cs.OrderBy(lambda c: c.Radius).Skip(1))
+        cirs = (
+            ss.Cast[acdb.ObjectId]()
+            .Select(lambda i: tr.getobject(i))
+            .GroupBy(lambda c: c.Center)
+            .SelectMany(lambda cs: cs.OrderBy(lambda c: c.Radius).Skip(1)))
         tr.erase(*cirs)
 
 @command()
@@ -29,14 +29,13 @@ def linqtest2(doc):
     if ss.ok():
         with dbtrans(doc) as tr:
             #按圆心的X坐标排序
-            cirs = \
-                ss.Cast[acdb.ObjectId]()\
-                .Select(lambda i: tr.getobject(i))\
-                .OrderBy(lambda c: c.Center.X)
+            cirs = (
+                ss.Cast[acdb.ObjectId]()
+                .Select(lambda i: tr.getobject(i))
+                .OrderBy(lambda c: c.Center.X))
             for cir in cirs:
                 print(cir.Center)
     elif ss.keyword("fIist"):
         print("first!")
     elif ss.keyword("Second"):
         print("second!")
-    

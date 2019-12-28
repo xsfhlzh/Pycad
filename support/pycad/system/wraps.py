@@ -1,9 +1,4 @@
-﻿from .mgdnss import *
-
-if hasattr(acap, 'Application'):
-    acapp = acap.Application
-else:
-    acapp = acap.Core.Application
+﻿from pycad.system.mgdnss import *
 
 def guid(gid = None):
     from System import Guid
@@ -42,3 +37,6 @@ def flatten(nested):
                     yield element
         except TypeError:
             yield nested
+
+
+        

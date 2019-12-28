@@ -1,6 +1,16 @@
 ﻿from pycad.system import *
 from pycad.runtime import *
 
+@command(flags=acrx.CommandFlags.UsePickSet)
+def comtest(doc):
+    #com方式获取图元图像
+    ss = edx.ssget()
+    if not ss.ok(): return
+    acdoc = acapp.AcadApplication.ActiveDocument
+    try: acdoc.SelectionSets['CURRENT'].Delete()
+    except: pass
+    acdoc.Export('d:\\1', 'wmf', acdoc.ActiveSelectionSet)
+
 @command()
 def myss1(doc):
     #获取两个角点
@@ -17,17 +27,16 @@ def myss2(doc):
     with dbtrans(doc) as tr:
         #选中当前空间内的所有直线
         ids = tuple(
-            i for i in tr.opencurrspace()
-            if i.ObjectClass.DxfName == 'LINE')
+            _ for _ in tr.opencurrspace()
+            if _.ObjectClass.DxfName == 'LINE')
         edx.sssetfirst(ids)
 
-@command(flags=acrx.CommandFlags.UsePickSet)
-def comtest(doc):
-    #com方式获取图元图像
-    ss = edx.ssget()
-    if not ss.ok(): return
-    acdoc = acapp.AcadApplication.ActiveDocument
-    try: acdoc.SelectionSets['CURRENT'].Delete()
-    except: pass
-    acdoc.Export('d:\\1', 'wmf', acdoc.ActiveSelectionSet)
+@command()
+def myss3(doc):
+    ss = edx.ssget(":N:S")
+    while ss.error():
+        ss = edx.ssget(":N:S")
+    if ss.cancel(): return
+    with dbtrans(doc) as tr:
+        print(tr.getobject(ss[0].ObjectId))
 

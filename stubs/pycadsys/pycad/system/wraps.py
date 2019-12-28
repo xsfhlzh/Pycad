@@ -9,13 +9,10 @@ class switch:
     """
     case = switch(value)
 
-    if case(somevalue): dosomething
-
-    if case[sometype]: dosomething
-
-    if case > 0: dosomething
-
-    if case.match(func): dosomething
+        if case(somevalue): dosomething
+        if case[sometype]: dosomething
+        if case > 0: dosomething
+        if case.match(func): dosomething
     """
 def flatten(nested) -> typing.Iterable:
     """
