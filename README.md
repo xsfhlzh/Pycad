@@ -18,4 +18,4 @@ Python Extension for AutoCad
 
 感谢山人编写的文档，但是改版暂时只能借鉴了，我们一起把他顶出来写新版的吧：）
 
-如果pye命令出现“系统找不到指定的文件”的错误，请按下面的目录找到配置文件，修改对应的参数为vscode的安装目录
+如果pye命令出现“系统找不到指定的文件”的错误，请在“Pycad\bin”目录下找到配置文件settings.json，修改“editor.path”参数为vscode的安装目录

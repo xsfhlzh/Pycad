@@ -40,8 +40,8 @@ def dbxtest(doc):
     with dbtrans(filename) as tr:
         btr = tr.openmodelspace()
         mat = acge.Matrix3d.Displacement(acge.Vector3d(10,0,0))
-        for eid in btr:
-            ent = tr.getobject(eid) #type: acdb.Entity
+        for i in btr:
+            ent = tr.getobject(i) #type: acdb.Entity
             with upopen(ent):
                 case = switch(ent)
                 if case[acdb.Line]:

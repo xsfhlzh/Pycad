@@ -11,7 +11,6 @@ def pysort(doc):
     from operator import itemgetter, attrgetter
     lst = sorted(pts, key = itemgetter(0, 1))
     #lst = sorted(pts, key = attrgetter("X", "Y"))
-    
 
 @command()
 @showtime
@@ -20,7 +19,7 @@ def linqsort(doc):
     import clr, System
     clr.ImportExtensions(System.Linq)
     q = (
-    pts.Cast[acge.Point3d]()
-    .OrderBy(lambda p: p.X)
-    .ThenBy(lambda p: p.Y))
+        pts.Cast[acge.Point3d]()
+        .OrderBy(lambda p: p.X)
+        .ThenBy(lambda p: p.Y))
     print(q)

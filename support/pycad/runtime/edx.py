@@ -4,7 +4,7 @@
     'getnested', 'getfile', 'getpoint', 'getcorner', 'getdist',
     'getangle', 'getstr', 'getreal', 'getint']
 
-class __result(object):
+class result(object):
     def __init__(self, status, value = None):
         self.status, self.value = status, value
     def ok(self):
@@ -15,10 +15,7 @@ class __result(object):
         return self.status == aced.PromptStatus.Cancel
     def keyword(self, *keywords):
         from pycad.system import aced
-        b = self.status == aced.PromptStatus.Keyword
-        if keywords:
-            return b and self.value in keywords
-        return b
+        return self.status == aced.PromptStatus.Keyword and self.value in keywords
     def modeless(self):
         from pycad.system import aced
         return self.status == aced.PromptStatus.Modeless
@@ -33,7 +30,7 @@ class __result(object):
         return self.status == getattr(aced.PromptStatus, "None")
 
 from System.Collections import IEnumerable as __ie
-class selection_result(__result, __ie):
+class selection_result(result, __ie):
     def __init__(self, ss_or_status, value = None):
         from pycad.system import aced
         if isinstance(ss_or_status, aced.PromptStatus):
@@ -48,7 +45,7 @@ class selection_result(__result, __ie):
     def __getitem__(self, id):
         return self.value[id]
 
-class value_result(__result):
+class value_result(result):
     def __init__(self, res):
         from pycad.system import aced
         if res.Status == aced.PromptStatus.OK:
@@ -58,7 +55,7 @@ class value_result(__result):
         else:
             super(value_result, self).__init__(res.Status)
 
-class string_result(__result):
+class string_result(result):
     def __init__(self, res):
         from pycad.system import aced
         if res.Status == aced.PromptStatus.OK:
@@ -198,7 +195,7 @@ def getpoint(message):
 def getcorner(message, basept = None):
     from pycad.system import stdio
     if basept:
-        if isinstance(basept, __result):
+        if isinstance(basept, result):
             basept = basept.value
         return value_result(stdio.ed.GetCorner(message, basept))
     else:

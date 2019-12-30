@@ -25,12 +25,12 @@ def mtexttest(doc):
         mt.Attachment = acdb.AttachmentPoint.BottomCenter
         #向当前空间添加
         tr.addentity(tr.opencurrspace(), mt)
-        
+
 @command()
 def mtexttest2(doc):
     #获取文字图元
     res = edx.entsel("\n请选择文字:")
-    if res is None: return
+    if not res.ok(): return
     with dbtrans(doc) as tr:
         #获取对象
         txt = tr.getobject(res.ObjectId)
@@ -127,7 +127,7 @@ def myline(doc):
 
 @command()
 def myline2(doc):
-    ed = doc.Editor
+    #模拟直线命令
     with dbtrans(doc) as tr:
         btr = tr.opencurrspace()
         lines, pts = [], []
@@ -152,6 +152,7 @@ def myline2(doc):
                 opts.UseDashedLine = False
                 respt = edx.getpoint(opts)
                 if respt.ok():
+                    #如果正确输入点就添加一条直线
                     pt = respt.value
                     if n > 0:
                         line = acdb.Line(pts[-1], pt)
@@ -160,10 +161,12 @@ def myline2(doc):
                         lines.append(line)
                         pts.append(pt)
                 elif respt.keyword('C'):
+                    #如果输入关键字C则闭合并退出
                     line = acdb.Line(pts[-1], pts[0])
                     tr.addentity(btr, line)
                     break
                 elif respt.keyword('U'):
+                    #如果输入关键字U则回退
                     del pts[-1]
                     if n > 1:
                         lines[-1].Erase()
@@ -173,6 +176,7 @@ def myline2(doc):
 
 @command()
 def mypl3d(doc):
+    #获取图元时按类型过滤
     opts = aced.PromptEntityOptions('\n选择三维多段线')
     opts.SetRejectMessage('错误类型')
     opts.AddAllowedClass(acdb.Polyline3d, False)
@@ -180,6 +184,7 @@ def mypl3d(doc):
     if not res.ok(): return
     with dbtrans(doc, False) as tr:
         pl = tr.getobject(res.ObjectId)
+        #遍历三维多段线, 显示折点坐标
         for i in pl:
             print(tr.getobject(i).Position)
 

@@ -1,22 +1,22 @@
 ﻿__all__ = [
     'ssget', 'ssget_x', 'ssget_l', 'ssget_p', 'ssget_f',
     'ssget_w', 'ssget_c', 'ssget_wp', 'ssget_cp', 'entsel',
-    'getnested', 'getfile', 'getpoint', 'getcorner', 'getdist',
-    'getangle', 'getstr', 'getreal', 'getint']
+    'getnested', 'getpoint', 'getcorner', 'getdist', 'getangle',
+    'getfile', 'getstr', 'getreal', 'getint']
 
-from pycad.system import acge as __acge, acdb as __acdb
-import typing as __typing
-from System.Collections import IEnumerable as __ie
+from pycad.system import acge, acdb, aced
+import typing
+from System.Collections import IEnumerable
 
-class __result(object):
+T = typing.TypeVar('T')
+class result(typing.Generic[T]):
     """
     带状态的返回值
     """
-    def __init__(self, status, value = None):...
     @property
-    def status(self):...
+    def status(self) -> aced.PromptStatus:...
     @property
-    def value(self):...
+    def value(self) -> T:...
     def ok(self) -> bool:...
     def cancel(self) -> bool:...
     def keyword(self, *keywords) -> bool:...
@@ -25,29 +25,29 @@ class __result(object):
     def other(self) -> bool:...
     def none(self) -> bool:...
 
-class selection_result(__result, __ie):
-    def __init__(self, ss_or_status, value = None):...
+class selection_result(result[aced.SelectionSet], typing.Iterable[aced.SelectedObject], IEnumerable):
     def GetEnumerator(self):...
-    def __getitem__(self, id):...
 
-class value_result(__result):
-    def __init__(self, res):...
+class value_result(result[T]):...
 
-class string_result(__result):
-    def __init__(self, res):...
+class string_result(result[str]):...
 
-class entity_result(value_result):
+class entity_result(result[object]):
     @property
-    def ObjectId(self):...
+    def ObjectId(self) -> acdb.ObjectId:...
     @property
-    def PickedPoint(self):...
+    def PickedPoint(self) -> acge.Point3d:...
 
-class subentity_result(entity_result):
+class subentity_result(result[object]):
     @property
-    def Transform(self):...
-    def GetContainers(self) -> tuple:...
+    def ObjectId(self) -> acdb.ObjectId:...
+    @property
+    def PickedPoint(self) -> acge.Point3d:...
+    @property
+    def Transform(self) -> acge.Matrix3d:...
+    def GetContainers(self) -> typing.Tuple[acdb.ObjectId]:...
 
-def ssget(mode: __typing.Optional[str], filters: __typing.Iterable, messages: __typing.Tuple[str, str], keywords: __typing.Tuple) -> selection_result:
+def ssget(mode: str, filters: typing.Iterable, messages: typing.Tuple[str, str], keywords: typing.Sequence[str]) -> selection_result:
     """
     在屏幕上选择图元
 
@@ -67,7 +67,7 @@ def ssget(mode: __typing.Optional[str], filters: __typing.Iterable, messages: __
         keywords: 关键字集合
     """
 
-def ssget_x(filters: __typing.Optional[__typing.Iterable])  -> selection_result:
+def ssget_x(filters: typing.Iterable)  -> selection_result:
     """
     选择全部图元
 
@@ -84,7 +84,7 @@ def ssget_p() -> selection_result:
     选择上一个选择集
     """
 
-def ssget_f(pts: __typing.Iterable[__acge.Point3d], filters: __typing.Optional[__typing.Iterable]) -> selection_result:
+def ssget_f(pts: typing.Iterable[acge.Point3d], filters: typing.Iterable) -> selection_result:
     """
     按给定的路径在屏幕上选择图元
 
@@ -92,7 +92,7 @@ def ssget_f(pts: __typing.Iterable[__acge.Point3d], filters: __typing.Optional[_
         filters: 过滤器,参考conv.BuildFilter函数
     """
 
-def ssget_w(pt1: __acge.Point3d, pt2: __acge.Point3d, filters: __typing.Optional[__typing.Iterable]) -> selection_result:
+def ssget_w(pt1: acge.Point3d, pt2: acge.Point3d, filters: typing.Iterable) -> selection_result:
     """
     按两个角点在屏幕上选择矩形窗口内的图元
 
@@ -101,7 +101,7 @@ def ssget_w(pt1: __acge.Point3d, pt2: __acge.Point3d, filters: __typing.Optional
         filters: 过滤器,参考conv.BuildFilter函数
     """
 
-def ssget_c(pt1: __acge.Point3d, pt2: __acge.Point3d, filters: __typing.Optional[__typing.Iterable]) -> selection_result:
+def ssget_c(pt1: acge.Point3d, pt2: acge.Point3d, filters: typing.Iterable) -> selection_result:
     """
     按两个角点在屏幕上选择穿过矩形窗口的图元
 
@@ -110,7 +110,7 @@ def ssget_c(pt1: __acge.Point3d, pt2: __acge.Point3d, filters: __typing.Optional
         filters: 过滤器,参考conv.BuildFilter函数
     """
 
-def ssget_wp(pts: __typing.Iterable[__acge.Point3d], filters: __typing.Optional[__typing.Iterable]) -> selection_result:
+def ssget_wp(pts: typing.Iterable[acge.Point3d], filters: typing.Iterable) -> selection_result:
     """
     按两个角点在屏幕上选择多边形窗口内的图元
 
@@ -119,7 +119,7 @@ def ssget_wp(pts: __typing.Iterable[__acge.Point3d], filters: __typing.Optional[
         filters: 过滤器,参考conv.BuildFilter函数
     """
 
-def ssget_cp(pts: __typing.Iterable[__acge.Point3d], filters: __typing.Optional[__typing.Iterable]) -> selection_result:
+def ssget_cp(pts: typing.Iterable[acge.Point3d], filters: typing.Iterable) -> selection_result:
     """
     按两个角点在屏幕上选择穿过多边形窗口的图元
 
@@ -128,7 +128,7 @@ def ssget_cp(pts: __typing.Iterable[__acge.Point3d], filters: __typing.Optional[
         filters: 过滤器,参考conv.BuildFilter函数
     """
 
-def sssetfirst(ss: __typing.Iterator[__acdb.ObjectId]):
+def sssetfirst(ss: typing.Iterator[acdb.ObjectId]):
     """
     将给定的图元加入Pickfirst选择集
 
@@ -147,7 +147,7 @@ def entsel(message) -> entity_result:
         message: 选择图元时的提示或设置
     """
 
-def getnested(message) -> value_result:
+def getnested(message) -> subentity_result:
     """
     获取子实体
 
@@ -162,49 +162,49 @@ def getfile(message, foropen = True) -> string_result:
         foropen： 显示打开或保存
     """
 
-def getpoint(message) -> value_result:
+def getpoint(message) -> value_result[acge.Point3d]:
     """
     获取点
 
         message: 选择点时的提示或设置
     """
 
-def getcorner(message) -> value_result:
+def getcorner(message) -> value_result[acge.Point3d]:
     """
     获取角点
 
         message: 选择角点时的提示或设置
     """
 
-def getangle(message) -> value_result:
+def getangle(message) -> value_result[float]:
     """
     获取角度
 
         message: 输入角度时的提示或设置
     """
 
-def getdist(message) -> value_result:
+def getdist(message) -> value_result[float]:
     """
     获取距离
 
         message: 输入距离时的提示或设置
     """
 
-def getreal(message) -> value_result:
+def getreal(message) -> value_result[float]:
     """
     获取浮点数
 
         message: 输入浮点数时的提示或设置
     """
 
-def getint(message) -> value_result:
+def getint(message) -> value_result[int]:
     """
     获取整数
 
         message: 输入整数时的提示或设置
     """
 
-def getstr(message, foropen = True) -> string_result:
+def getstr(message) -> string_result:
     """
     获取字符串
 

@@ -10,7 +10,7 @@ def ccitest(doc):
     #用cci类判断重合
     cci = acge.CurveCurveIntersector3d(line1, line2, acge.Vector3d.ZAxis)
     for r in range(cci.OverlapCount()):
-        overloads = cci.GetOverlapRanges(r) 
+        overloads = cci.GetOverlapRanges(r)
         #显示重合信息,即重合部分的曲线参数范围
         print("%s, %s" % (overloads[0].LowerBound, overloads[0].UpperBound))
         print("%s, %s" % (overloads[1].LowerBound, overloads[1].UpperBound))

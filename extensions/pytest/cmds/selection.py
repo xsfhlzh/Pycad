@@ -33,9 +33,9 @@ def myss2(doc):
 
 @command()
 def myss3(doc):
-    ss = edx.ssget(":N:S")
+    ss = edx.ssget(":E:S")
     while ss.error():
-        ss = edx.ssget(":N:S")
+        ss = edx.ssget(":E:S")
     if ss.cancel(): return
     with dbtrans(doc) as tr:
         print(tr.getobject(ss[0].ObjectId))

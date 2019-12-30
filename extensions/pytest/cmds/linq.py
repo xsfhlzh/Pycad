@@ -23,8 +23,8 @@ def linqtest(doc):
 def linqtest2(doc):
     #选择圆
     ss = edx.ssget(
-        filters=(0, 'circle'), 
-        messages=("\n请选择圆", ""), 
+        filters=(0, 'circle'),
+        messages=("\n请选择圆", ""),
         keywords=("fIist", "Second"))
     if ss.ok():
         with dbtrans(doc) as tr:
