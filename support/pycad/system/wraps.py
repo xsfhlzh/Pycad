@@ -37,6 +37,3 @@ def flatten(nested):
                     yield element
         except TypeError:
             yield nested
-
-
-        

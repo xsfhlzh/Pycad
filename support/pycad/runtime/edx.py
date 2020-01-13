@@ -45,27 +45,27 @@ class selection_result(result, __ie):
     def __getitem__(self, id):
         return self.value[id]
 
-class value_result(result):
-    def __init__(self, res):
+class _result(result):
+    def __init__(self, res, func):
         from pycad.system import aced
         if res.Status == aced.PromptStatus.OK:
-            super(value_result, self).__init__(aced.PromptStatus.OK, res.Value)
+            super(_result, self).__init__(aced.PromptStatus.OK, func(res))
         elif res.Status == aced.PromptStatus.Keyword:
-            super(value_result, self).__init__(aced.PromptStatus.Keyword, res.StringResult)
+            super(_result, self).__init__(aced.PromptStatus.Keyword, res.StringResult)
         else:
-            super(value_result, self).__init__(res.Status)
+            super(_result, self).__init__(res.Status)
 
-class string_result(result):
+class value_result(_result):
     def __init__(self, res):
-        from pycad.system import aced
-        if res.Status == aced.PromptStatus.OK:
-            super(string_result, self).__init__(aced.PromptStatus.OK, res.StringResult)
-        elif res.Status == aced.PromptStatus.Keyword:
-            super(string_result, self).__init__(aced.PromptStatus.Keyword, res.StringResult)
-        else:
-            super(string_result, self).__init__(res.Status)
+        super(value_result, self).__init__(res, lambda r: r.Value)
 
-class entity_result(value_result):
+class string_result(_result):
+    def __init__(self, res):
+        super(string_result, self).__init__(res, lambda r: r.StringResult)
+
+class entity_result(_result):
+    def __init__(self, res):
+        super(entity_result, self).__init__(res, lambda r: r)
     @property
     def ObjectId(self):
         return self.value.ObjectId

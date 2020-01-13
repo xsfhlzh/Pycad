@@ -15,12 +15,13 @@ namespace NFox.Pycad.Core.Modules
     public static class pye
     {
 
-        private static dynamic GetFunc(string name)
+        private static dynamic GetFunc(string prjname, string name)
         {
             int index = name.LastIndexOf('.');
             string modname = name.Substring(0, index);
-            Engine.Instance.Import(modname);
-            return Engine.Instance.Execute(name);
+            var ext = Engine.Extensions[prjname];
+            ext.Engine.Import(modname);
+            return ext.Engine.Execute(name);
         }
 
         public static void runsyscmd(string name)
@@ -28,26 +29,25 @@ namespace NFox.Pycad.Core.Modules
             Engine.Instance.SystemCommands[name]();
         }
 
-        public static void runcmd(string name)
+        public static void runcmd(string prjname, string name)
         {
             try
             {
                 Application.Curr.SendMessage("BeforeCommand");
-                GetFunc(name).__call__();
+                GetFunc(prjname, name).__call__();
             }
-            catch { }
             finally
             {
                 Application.Curr.SendMessage("AfterCommand");
             }
         }
 
-        public static object invokelisp(string name, dynamic args)
+        public static object invokelisp(string prjname, string name, dynamic args)
         {
             try
             {
                 Application.Curr.SendMessage("BeforeCommand");
-                return GetFunc(name).__call__(args);
+                return GetFunc(prjname, name).__call__(args);
             }
             catch
             {
@@ -57,6 +57,68 @@ namespace NFox.Pycad.Core.Modules
             {
                 Application.Curr.SendMessage("AfterCommand");
             }
+        }
+
+        public static ExtensionCollection extensions
+        {
+            get { return Engine.Extensions; }
+        }
+
+        public static Package supportmodules
+        {
+            get { return Engine.Support; }
+        }
+
+        private static void open(string path)
+        {
+            var pro = new System.Diagnostics.Process();
+            pro.EnableRaisingEvents = false;
+            pro.StartInfo.FileName = getvar("editor.path");
+            pro.StartInfo.Arguments = $"\"{path}\\\"";
+            pro.Start();
+        } 
+
+        public static void open_extension(string name)
+        {
+            var ext = extensions[name];
+            if (ext != null)
+            {
+                ext.CheckInfo();
+                open(extensions[name].Path);
+            }
+        }
+
+        public static void create_extension(string name)
+        {
+            var dir = DirectoryEx.Extensions.CreateSubdirectory(name);
+            var extdir = dir.CreateSubdirectory("extension");
+            var file = File.Create(extdir.GetFileFullName("__init__.py"));
+            file.Close();
+            dir.CreateSubdirectory("data");
+            dir.CreateSubdirectory("cuix");
+            var ext = new Extension(dir);
+            ext.Init(false);
+            Engine.Extensions.Add(ext);
+            ext.CreateInfo();
+            open_extension(name);
+        }
+
+        public static void open_support()
+        {
+            open(DirectoryEx.Support.FullName);
+        }
+
+        public static void create_supportmodule(string name)
+        {
+            var dir = DirectoryEx.Support.CreateSubdirectory(name);
+            var file = File.Create(dir.GetFileFullName("__init__.py"));
+            Engine.Support.Add(new Package(dir));
+            open_support();
+        }
+
+        public static dynamic getvar(string name)
+        {
+            return Application.GetVariable(name);
         }
 
         private static dynamic _tempvalue;
@@ -78,14 +140,12 @@ namespace NFox.Pycad.Core.Modules
 
         public static void executefile(string path)
         {
-            Engine.Instance.ExecuteFile(path, true);
+            Engine.Instance.ExecuteFile(path);
         }
 
         public static string findfile(string modulename, string filename)
         {
-            if (modulename.Contains("."))
-                modulename = modulename.Substring(0, modulename.IndexOf('.'));
-            return Engine.Instance.Extensions.GetExtension(modulename).FindFile(filename);
+            return Engine.Extensions[modulename].FindFile(filename);
         }
 
         public static string location
@@ -113,29 +173,33 @@ namespace NFox.Pycad.Core.Modules
             get { return DirectoryEx.Extensions.FullName; }
         }
 
-        public static void install(string extfile)
-        {
-
-        }
-
         public static Version version
         {
             get { return Application.Version; }
         }
 
-        public static void release(dynamic module)
+        public static void release(string packagename, Extension[] exts)
         {
-            string name = module.__name__;
-            Extension e = Engine.Instance.Extensions.GetExtension(name);
-            Engine.Instance.Release(name, new List<Extension> { e });
+            Engine.Instance.Release(exts);
+            string name = packagename;
+            int i = 2;
+            while(DirectoryEx.Temp.GetFile(name + ".Setup.dll") != null)
+                name = packagename + i++;
             DynamicCompiler.BuildReleaseAssembly($"{DirectoryEx.Temp.FullName}\\{name}.Setup.dll");
         }
 
-        public static void build(dynamic module)
+        public static void build_extension(string name)
         {
-            string name = module.__name__;
-            var path = DirectoryEx.Temp.FullName;
-            Engine.Instance.Build(name, path);
+            var ext = Engine.Extensions[name];
+            if (ext == null || ext.Compiled)
+                ext = new Extension(DirectoryEx.Extensions.GetDirectory(name));
+            using (var fs = File.Create(Path.Combine(DirectoryEx.Temp.FullName, name + ".ext")))
+                ext.Build(fs);
+        }
+
+        public static void build_module(string name)
+        {
+            Engine.Support.Packages[name].Build();
         }
 
         public static void reference(string filename)

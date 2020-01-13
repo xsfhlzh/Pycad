@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 
 namespace NFox.Pycad
@@ -8,11 +7,53 @@ namespace NFox.Pycad
     public static class DirectoryEx
     {
 
-        public static FileInfo Location
+        static FileInfo _location;
+        static DirectoryInfo _main;
+        static bool _startFromMain;
+        static DirectoryInfo _root;
+        static DirectoryInfo _mainBackup;
+
+        public static void Init()
         {
-            get { return new FileInfo(Assembly.GetCallingAssembly().Location); }
+            _location = new FileInfo(Assembly.GetExecutingAssembly().Location);
+            _main = _location.Directory;
+            _startFromMain = _main.Name == "main";
+            if (_startFromMain)
+            {
+                _root = _mainBackup = _main.Parent;
+            }
+            else
+            {
+                _root = _main;
+                _mainBackup = _main.CreateSubdirectory("main");
+            }
+
+            //如果从Main目录启动, 更新主目录文件
+            if (_startFromMain)
+            {
+                foreach (var file in _main.GetFiles())
+                    file.CopyTo(_mainBackup.GetFileFullName(file.Name));
+            }
         }
-        public static DirectoryInfo Root { get; } = Location.Directory;
+
+        public static bool StartFromMain { get { return _startFromMain; } }
+
+        public static DirectoryInfo Main { get { return _main; } }
+
+        public static DirectoryInfo MainBackup { get { return _mainBackup; } }
+
+        public static FileInfo Location { get { return _location; } }
+
+        public static DirectoryInfo Root
+        {
+            get
+            {
+                if (_root == null)
+                    Init();
+                return _root;
+            }
+        }
+
         public static DirectoryInfo Bin { get; } = Root.GetDirectory("bin");
 
         public static DirectoryInfo Plugins { get; } = Root.GetDirectory("plugins");

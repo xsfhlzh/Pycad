@@ -21,9 +21,14 @@
     <Plugin Name="NFox.Pycad.Core" />
   </Directory>
   <Directory Name="support">
-    <File Name="pycad" Build='True'/>
+    <Module Name="pycad" />
   </Directory>
-  <Directory Name="extensions" />
+  <Directory Name="extensions">
+    <Directory Name=".release" />
+    <Directory Name=".scripts" />
+    <Extension Name="pycad" />
+  </Directory>
+  <Directory Name="main" />
   <Directory Name="temp" />
   <Directory Name="update">
     <Directory Name="extensions" />

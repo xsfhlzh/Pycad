@@ -66,6 +66,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Runtime\Engine.cs" />
+    <Compile Include="Runtime\ExtensionCollection.cs" />
     <Compile Include="Runtime\Module.cs" />
     <Compile Include="Runtime\Package.cs" />
     <Compile Include="Runtime\Extension.cs" />

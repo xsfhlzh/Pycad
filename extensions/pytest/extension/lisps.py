@@ -15,7 +15,9 @@ def mylisp(doc, args):
 
 @lisp()
 def mylisp0(doc, args):
-    return args
+    for lispdata in args[0]:
+        print(lispdata)
+    return args[0][0]
 
 @lisp()
 @showtime
@@ -34,13 +36,13 @@ def mylisp2(doc, args):
 
 @lisp()
 def mylisp3(doc, args):
-    from pytest.forms.WpfTestForm import WpfTestForm
+    from .forms.WpfTestForm import WpfTestForm
     acapp.ShowModalDialog(WpfTestForm())
     return utils.getvalue('WpfTestForm')
 
 @lisp()
 def mylisp4(doc, args):
-    return flatten([1,[2,3],4,[5,6,[7,8,[9]]]])
+    return [1,[2,3],4,[5,6,[7,8,[9]]]]
 
 @lisp()
 def clipboard(doc, args):

@@ -1,0 +1,23 @@
+{
+    "files": ["NFox.Pycad.dll", "NFox.Pycad.Acad.dll", "NFox.Pycad.Gcad.dll"],
+    "directories": {
+        "bin": {
+            "files": ["Microsoft.Dynamic.dll", "Microsoft.Scripting.dll", "IronPython.dll", "IronPython.Modules.dll", "IronPython.SQLite.dll", "IronPython.Wpf.dll", "Lib.zip", "Newtonsoft.Json.dll", "NFox.Pycad.Runtime.dll", "package.json", "settings.json"]
+        },
+        "support": {
+            "modules": ["pycad"]
+        },
+        "plugins": ["NFox.Pycad.Update", "NFox.Pycad.Core"],
+        "extensions": {
+            "directories": {
+                ".script": {},
+                ".release": {}
+            }
+        },
+        "update": {
+            "directories": {
+                "extensions": {}
+            }
+        }
+    }
+}

@@ -8,12 +8,12 @@ def mymsg(doc):
 
 @command()
 def showwpf(doc):
-    from pytest.forms.WpfTestForm import WpfTestForm
+    from extension.forms.WpfTestForm import WpfTestForm
     acap.Application.ShowModalDialog(WpfTestForm())
 
 @command()
 def showfrm(doc):
-    from pytest.forms.TForm import TForm
+    from extension.forms.TForm import TForm
     acap.Application.ShowModalDialog(TForm())
 
 

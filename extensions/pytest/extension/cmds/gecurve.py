@@ -1,6 +1,5 @@
 ﻿from pycad.system import *
 from pycad.runtime import *
-import typing
 
 @command()
 def ccitest(doc):
@@ -104,4 +103,3 @@ def linetest(doc):
         line2 = tr.getobject(res2.ObjectId) #type: acdb.Line
         #用向量判断是否平行
         print(line1.Delta.IsParallelTo(line2.Delta))
-

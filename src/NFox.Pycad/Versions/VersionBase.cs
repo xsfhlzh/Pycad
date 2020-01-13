@@ -1,4 +1,6 @@
-﻿namespace NFox.Pycad
+﻿using System.IO;
+
+namespace NFox.Pycad
 {
     public abstract class VersionBase
     {
@@ -22,8 +24,11 @@
 
         public abstract void RegApp(string name, string location, string desc);
 
-        public static void RegApp()
+        public static void RegApp(DirectoryInfo root = null)
         {
+
+            if (root == null)
+                root = DirectoryEx.Root;
 
             //注册所有AutoCad版本
             foreach (var ver in AcadVersion.Versions)
@@ -32,12 +37,10 @@
                 if (ver.Number >= 2012)
                     ver.RegApp(
                         "NFox.Pycad",
-                        DirectoryEx.Root.GetFile("NFox.Pycad.Acad.dll").FullName,
+                        root.GetFile("NFox.Pycad.Acad.dll").FullName,
                         "NFox Pycad Loader");
 
             }
-
-
 
             //注册所有GstarCAD版本
             foreach (var ver in GcadVersion.Versions)
@@ -45,7 +48,7 @@
 
                 ver.RegApp(
                     "NFox.Pycad",
-                    DirectoryEx.Root.GetFile("NFox.Pycad.Gcad.dll").FullName,
+                    root.GetFile("NFox.Pycad.Gcad.dll").FullName,
                     "NFox Pycad Loader");
 
             }

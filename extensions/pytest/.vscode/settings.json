@@ -1,10 +1,9 @@
 {
     "python.pythonPath": "C:\\Program Files\\Python37",
-    "python.autoComplete.extraPaths": ["..\\stubs\\pycadsys", "..\\stubs\\clrclasses"],
-    "python.jediEnabled": false,
+    "python.autoComplete.extraPaths": ["D:\\Pycad\\stubs\\pycadsys", "D:\\Pycad\\stubs\\clrclasses"],
     "python.linting.enabled": true,
     "terminal.integrated.shell.windows": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
     "terminal.integrated.shellArgs.windows": [
-        "..\\bin\\pyconsole.exe"
+        "D:\\Pycad\\bin\\pyconsole.exe"
     ],
 }

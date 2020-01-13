@@ -15,4 +15,3 @@ D:\Pycad\Bin\pyconsole.exe
 D:\Pycad\Bin\pyconsole.pdb
 D:\Pycad\Src\NFox.Pycad.Console\obj\Debug\pyconsole.exe
 D:\Pycad\Src\NFox.Pycad.Console\obj\Debug\pyconsole.pdb
-D:\Pycad\src\NFox.Pycad.Console\obj\Debug\NFox.Pycad.Console.csprojResolveAssemblyReference.cache

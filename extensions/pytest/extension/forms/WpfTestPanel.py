@@ -24,11 +24,10 @@ class WpfTestPanel(System.Windows.Forms.UserControl):
         self.Controls.Add(self.elementHost)
         self.Text = "WpfTest"
 
-
 class UCWpfTestPanel(UserControl):
     def __init__(self):
         from pycad.system import pye
-        wpf.LoadComponent(self, pye.findfile(__name__, 'WpfTestForm.xaml'))
+        wpf.LoadComponent(self, pye.findfile(__path__, 'WpfTestForm.xaml'))
 
     def Input_Button_Click(self, sender, e):
         self.InputTb.Text += sender.Content

@@ -20,20 +20,10 @@ namespace NFox.Pycad.Core
 
         #region Plugin
 
-        public void Edit()
-        {
-            System.Diagnostics.Process pro = new System.Diagnostics.Process();
-            pro.EnableRaisingEvents = false;
-            pro.StartInfo.FileName = Application.GetVariable("editor.path");
-            pro.StartInfo.Arguments = $"\"{DirectoryEx.Extensions.FullName}\\\"";
-            pro.Start();
-        }
-
         protected override void OnInitializing()
         {
             LoadSettings();
             Engine.Instance.AddSystemCommand("pyrb", new Action(Start));
-            Engine.Instance.AddSystemCommand("pye", new Action(Edit));
         }
 
         private void LoadSettings()
@@ -72,10 +62,9 @@ namespace NFox.Pycad.Core
         {
             try
             {
-               
+                Engine.Assemblies = new List<Assembly> { Assembly.GetExecutingAssembly() };
                 //初始化引擎
                 Engine.Instance.Restart();
-                Engine.Instance.LoadAssembly(Assembly.GetExecutingAssembly());
 
                 //从acad.py中获取初始化信息
                 //Engine.Instance.TryReference("pycad.dll");
@@ -94,6 +83,10 @@ namespace NFox.Pycad.Core
         {
             try
             {
+
+
+
+
                 //获取当前版本Cad的Mgd程序集
                 List<string> mgds = new List<string>();
                 var mainmgds = Engine.Instance.Execute("pycad.system.mgds[0]");
@@ -108,16 +101,17 @@ namespace NFox.Pycad.Core
                 DynamicCompiler.BuildSystemAssembly();
 
                 //动态编译用户命令集
-                Engine.Instance.LoadExtensions(_loadfirst);
+                Engine.LoadExtensions(_loadfirst);
                 _loadfirst = false;
                 DynamicCompiler.BuildUserAssembly();
 
                 if (CurrSystem != "acore")
                 {
                     var menus = Engine.Instance.Execute("acapp.MenuGroups");
-                    foreach(Extension p in Engine.Instance.Extensions.Packages)
+                    foreach(Extension p in Engine.Extensions)
                         p.LoadCuixs(menus);
                 }
+                Engine.Instance.Execute("with acdoc(): print('项目编译成功!')");
             }
             catch (Exception ex)
             {

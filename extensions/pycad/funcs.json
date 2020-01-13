@@ -1,0 +1,12 @@
+{
+  "commands": {
+    "": {
+      "pyrun": "",
+      "pyreference": "",
+      "pyedit": "",
+      "pyrelease": ""
+    }
+  },
+  "panels": {},
+  "lisps": {}
+}

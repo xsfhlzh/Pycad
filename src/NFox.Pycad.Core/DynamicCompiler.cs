@@ -4,7 +4,6 @@ using System.CodeDom;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.IO;
-using System;
 
 namespace NFox.Pycad
 {
@@ -98,8 +97,6 @@ namespace NFox.Pycad
 
         private static int _tempIndex;
 
-        private static List<string> _modules;
-
         public static bool BuildUserAssembly()
         {
 
@@ -129,30 +126,31 @@ namespace NFox.Pycad
             ns.Types.Add(cmdsclass);
             
             var prjnames = 
-                Engine.Instance.Extensions.Packages
+                Engine.Extensions
                 .Select(p => p.Name)
                 .ToList();
-            prjnames.Add("pycad");
 
             int i = 0;
-            _modules = new List<string>();
-            foreach (string name in prjnames)
+            foreach (Extension prj in Engine.Extensions)
             {
-                foreach (dynamic cmd in GetItems(name, "commands").items())
-                     cmdsclass.Members.Add(BuildCmdMethod(cmd, "command", i++));
-                foreach (dynamic cmd in GetItems(name, "panels").items())
-                    cmdsclass.Members.Add(BuildCmdMethod(cmd, "panel", i++));
-                foreach (dynamic lisp in GetItems(name, "lisps").items())
-                    cmdsclass.Members.Add(BuildLispMethod(lisp, i++));
-            }
-
-            if (Application.CurrSystem != "acore")
-            {
-                new Action(() =>
+                if (prj.Funcs != null)
                 {
-                    foreach (var name in _modules.Distinct())
-                        Engine.Instance.TryImport(name);
-                }).BeginInvoke(null, null);
+                    foreach (dynamic cmds in prj.Funcs["commands"])
+                    {
+                        foreach(var cmd in cmds.Value)
+                            cmdsclass.Members.Add(BuildCmdMethod(prj.Name, cmds.Name, cmd, "command", i++));
+                    }
+                    foreach (dynamic cmds in prj.Funcs["panels"])
+                    {
+                        foreach (var cmd in cmds.Value)
+                            cmdsclass.Members.Add(BuildCmdMethod(prj.Name, cmds.Name, cmd, "panel", i++));
+                    }
+                    foreach (dynamic lisps in prj.Funcs["lisps"])
+                    {
+                        foreach (var lisp in lisps.Value)
+                            cmdsclass.Members.Add(BuildLispMethod(prj.Name, lisps.Name, lisp, i++));
+                    }
+                }
             }
 
             //生成驻留内存的动态程序集
@@ -178,25 +176,18 @@ namespace NFox.Pycad
 
         }
 
-        private static dynamic GetItems(string prjname, string type)
-        {
-            try { return Engine.Instance.Execute($"{prjname}.{type}"); }
-            catch { return new IronPython.Runtime.PythonDictionary(); }
-        }
-
-        private static CodeMemberMethod BuildCmdMethod(dynamic cmd, string type, int index)
+        private static CodeMemberMethod BuildCmdMethod(string prjname, string modulename, dynamic cmd, string type, int index)
         {
 
             CodeMemberMethod method =
                 new CodeMemberMethod { Name = $"Cmd_{index}" };
             var args = new List<CodeAttributeArgument>();
 
-            dynamic instance = Engine.Instance.Execute($"{type}({cmd[1]})");
+            dynamic instance = Engine.Instance.Execute($"{type}({cmd.Value})");
 
-            string name = cmd[0];
+            string name = cmd.Name;
             if (instance.name == null)
-                instance.name = name.Substring(name.LastIndexOf(".") + 1);
-            _modules.Add(name.Substring(0, name.LastIndexOf(".")));
+                instance.name = name;
 
             if ((int)instance.flags != 0)
                 args.Add(
@@ -217,23 +208,22 @@ namespace NFox.Pycad
 
             method.Statements.Add(
                 new CodeSnippetStatement(
-                    $"NFox.Pycad.Core.Modules.pye.runcmd(\"{cmd[0]}\");"));
+                    $"NFox.Pycad.Core.Modules.pye.runcmd(\"{prjname}\", \"extension{modulename}.{cmd.Name}\");"));
             return method;
 
         }
 
-        private static CodeMemberMethod BuildLispMethod(dynamic lisp, int index)
+        private static CodeMemberMethod BuildLispMethod(string prjname, string modulename, dynamic lisp, int index)
         {
 
             CodeMemberMethod method =
                 new CodeMemberMethod { Name = $"Lisp_{index}" };
             var args = new List<CodeAttributeArgument>();
 
-            dynamic instance = Engine.Instance.Execute($"lisp({lisp[1]})");
-            string name = lisp[0];
+            dynamic instance = Engine.Instance.Execute($"lisp({lisp.Value})");
+            string name = lisp.Name;
             if (instance.name == null)
-                instance.name = name.Substring(name.LastIndexOf(".") + 1);
-            _modules.Add(name.Substring(0, name.LastIndexOf(".")));
+                instance.name = name;
 
             //设置命令名
             args.Add(
@@ -251,7 +241,7 @@ namespace NFox.Pycad
 
             method.Statements.Add(
                 new CodeSnippetStatement(
-                    $"return NFox.Pycad.Core.Modules.pye.invokelisp(\"{lisp[0]}\", rb);"));
+                    $"return NFox.Pycad.Core.Modules.pye.invokelisp(\"{prjname}\", \"extension{modulename}.{lisp.Name}\", rb);"));
             return method;
 
         }
@@ -339,22 +329,38 @@ namespace NFox.Pycad
                 new CodeSnippetStatement("sr.Dispose();"));
             method.Statements.Add(
                 new CodeSnippetStatement("cstream.Dispose();"));
+
             method.Statements.Add(
                 new CodeVariableDeclarationStatement(
-                    "RegistryKey", "rk",
-                    new CodeSnippetExpression("Registry.CurrentUser.OpenSubKey(\"Software\", Microsoft.Win32.RegistryKeyPermissionCheck.ReadWriteSubTree)")));
+                    "Stream", "pstream",
+                    new CodeSnippetExpression("zip.GetEntry(\"package.xml\").Open()")));
             method.Statements.Add(
                 new CodeVariableDeclarationStatement(
-                    "RegistryKey", "nfoxrk",
-                    new CodeSnippetExpression("rk.OpenSubKey(\"NFox\")")));
+                    "XElement", "xe",
+                    new CodeSnippetExpression("XElement.Load(pstream)")));
+            method.Statements.Add(
+                new CodeSnippetStatement("pstream.Dispose();"));
+
             method.Statements.Add(
                 new CodeVariableDeclarationStatement(
-                    "RegistryKey", "pycadrk",
-                    new CodeSnippetExpression("rk.CreateSubKey(\"NFox\").CreateSubKey(\"Pycad\")")));
+                    "Microsoft.Win32.RegistryKey", "rk",
+                    new CodeSnippetExpression("Microsoft.Win32.Registry.CurrentUser.OpenSubKey(\"Software\", Microsoft.Win32.RegistryKeyPermissionCheck.ReadWriteSubTree)")));
+            method.Statements.Add(
+                new CodeVariableDeclarationStatement(
+                    "Microsoft.Win32.RegistryKey", "nfoxrk",
+                    new CodeSnippetExpression("rk.CreateSubKey(\"NFox\")")));
+            method.Statements.Add(
+                new CodeVariableDeclarationStatement(
+                    "Microsoft.Win32.RegistryKey", "pycadrk",
+                    new CodeSnippetExpression("nfoxrk.CreateSubKey(\"Pycad\")")));
+            method.Statements.Add(
+                new CodeVariableDeclarationStatement(
+                    "Object", "verobj",
+                    new CodeSnippetExpression("pycadrk.GetValue(\"Version\")")));
 
             var ifstat =
                 new CodeConditionStatement(
-                    new CodeSnippetExpression("nfoxrk == null || nfoxrk.OpenSubKey(\"Pycad\") == null"));
+                    new CodeSnippetExpression("verobj == null"));
             method.Statements.Add(ifstat);
 
             ifstat.TrueStatements.Add(
@@ -381,37 +387,16 @@ namespace NFox.Pycad
                     "DirectoryInfo", "dir",
                     new CodeSnippetExpression("Directory.CreateDirectory(mainpath)")));
             ifstat.TrueStatements.Add(
-                new CodeVariableDeclarationStatement(
-                    "Stream", "pstream",
-                    new CodeSnippetExpression("zip.GetEntry(\"Update\\\\Package.xml\").Open()")));
-            ifstat.TrueStatements.Add(
-                new CodeVariableDeclarationStatement(
-                    "XElement", "xe",
-                    new CodeSnippetExpression("XElement.Load(pstream);")));
-            ifstat.TrueStatements.Add(
-                new CodeSnippetStatement("pstream.Dispose();"));
-            ifstat.TrueStatements.Add(
                 new CodeSnippetStatement("CopyFiles(xe, dir, zip);"));
-
             ifstat.TrueStatements.Add(
-                new CodeIterationStatement(
-                    new CodeVariableDeclarationStatement(
-                        "IEnumerator<ZipArchiveEntry>", "itor",
-                        new CodeSnippetExpression("zip.Entries.GetEnumerator()")),
-                    new CodeSnippetExpression("itor.MoveNext()"),
-                    new CodeSnippetStatement(""),
-                    new CodeSnippetStatement("ZipArchiveEntry ent = itor.Current;"),
-                    new CodeConditionStatement(
-                        new CodeSnippetExpression("ent.FullName.StartsWith(\"Update\\\\Projects\")"),
-                        new CodeSnippetStatement("Copy(ent, mainpath + \"\\\\\" + ent.FullName);"))));
-
+                new CodeSnippetStatement("UnzipExts(zip, mainpath);"));
             ifstat.TrueStatements.Add(
                 new CodeSnippetStatement("Assembly.LoadFrom(mainpath+ \"\\\\NFox.Pycad.dll\");"));
 
             ifstat.FalseStatements.Add(
                 new CodeVariableDeclarationStatement(
                     "Version", "oldver",
-                    new CodeSnippetExpression("Version.Parse(pycadrk.GetValue(\"Version\").ToString())")));
+                    new CodeSnippetExpression("Version.Parse(verobj.ToString())")));
             ifstat.FalseStatements.Add(
                 new CodeSnippetStatement("mainpath = pycadrk.GetValue(\"MainPath\").ToString();"));
 
@@ -421,26 +406,14 @@ namespace NFox.Pycad
             ifstat.FalseStatements.Add(ifstat2);
 
             ifstat2.TrueStatements.Add(
-                new CodeIterationStatement(
-                    new CodeVariableDeclarationStatement(
-                        "IEnumerator<ZipArchiveEntry>", "itor",
-                        new CodeSnippetExpression("zip.Entries.GetEnumerator()")),
-                    new CodeSnippetExpression("itor.MoveNext()"),
-                    new CodeSnippetStatement(""),
-                    new CodeSnippetStatement("ZipArchiveEntry ent = itor.Current;"),
-                    new CodeSnippetStatement("Copy(ent, mainpath + \"\\\\\" + ent.FullName);")));
+                new CodeVariableDeclarationStatement(
+                    "DirectoryInfo", "dir2",
+                    new CodeSnippetExpression("Directory.CreateDirectory(mainpath)")));
+            ifstat2.TrueStatements.Add(
+                new CodeSnippetStatement("CopyFiles(xe, dir2.CreateSubdirectory(\"update\"), zip);"));
 
-            ifstat2.FalseStatements.Add(
-                new CodeIterationStatement(
-                    new CodeVariableDeclarationStatement(
-                        "IEnumerator<ZipArchiveEntry>", "itor",
-                        new CodeSnippetExpression("zip.Entries.GetEnumerator()")),
-                    new CodeSnippetExpression("itor.MoveNext()"),
-                    new CodeSnippetStatement(""),
-                    new CodeSnippetStatement("ZipArchiveEntry ent = itor.Current;"),
-                    new CodeConditionStatement(
-                        new CodeSnippetExpression("ent.FullName.StartsWith(\"Update\\\\Projects\")"),
-                        new CodeSnippetStatement("Copy(ent, mainpath + \"\\\\\" + ent.FullName);"))));
+            ifstat.FalseStatements.Add(
+                new CodeSnippetStatement("UnzipExts(zip, mainpath);"));
 
             method.Statements.Add(
                 new CodeSnippetStatement("pycadrk.Dispose();"));
@@ -458,6 +431,30 @@ namespace NFox.Pycad
                 new CodeMemberMethod { Name = "Terminate" };
             method.Attributes = MemberAttributes.Public;
             appclass.Members.Add(method);
+
+            //函数UnzipExts
+            method =
+                new CodeMemberMethod { Name = "UnzipExts" };
+            method.Parameters.Add(
+                new CodeParameterDeclarationExpression(
+                    "ZipArchive", "zip"));
+            method.Parameters.Add(
+                new CodeParameterDeclarationExpression(
+                    "String", "path"));
+            method.Attributes = MemberAttributes.Private;
+            appclass.Members.Add(method);
+
+            method.Statements.Add(
+                new CodeIterationStatement(
+                    new CodeVariableDeclarationStatement(
+                        "IEnumerator<ZipArchiveEntry>", "itor",
+                        new CodeSnippetExpression("zip.Entries.GetEnumerator()")),
+                    new CodeSnippetExpression("itor.MoveNext()"),
+                    new CodeSnippetStatement(""),
+                    new CodeSnippetStatement("ZipArchiveEntry ent = itor.Current;"),
+                    new CodeConditionStatement(
+                        new CodeSnippetExpression("ent.FullName.StartsWith(\"extensions\\\\\")"),
+                        new CodeSnippetStatement("Copy(ent, path + \"\\\\update\\\\extensions\\\\\" + ent.Name);"))));
 
             //函数Copy
             method =
@@ -482,9 +479,9 @@ namespace NFox.Pycad
             method.Statements.Add(
                 new CodeSnippetStatement("source.Dispose();"));
 
-            //函数UnzipDllx
+            //函数Unzip
             method =
-                new CodeMemberMethod { Name = "UnzipDllx" };
+                new CodeMemberMethod { Name = "Unzip" };
             method.Parameters.Add(
                 new CodeParameterDeclarationExpression(
                     "Stream", "stream"));
@@ -550,8 +547,12 @@ namespace NFox.Pycad
                  new CodeVariableDeclarationStatement(
                     "XElement", "e",
                     new CodeSnippetExpression("it.Current")));
+            forstat.Statements.Add(
+                new CodeVariableDeclarationStatement(
+                    "String", "name",
+                    new CodeSnippetExpression("e.Attribute(\"Name\").Value")));
 
-            ifstat = 
+            ifstat =
                 new CodeConditionStatement(
                     new CodeSnippetExpression("e.Name.LocalName == \"Directory\""));
             forstat.Statements.Add(ifstat);
@@ -559,68 +560,41 @@ namespace NFox.Pycad
             ifstat.TrueStatements.Add(
                 new CodeVariableDeclarationStatement(
                     "DirectoryInfo", "sdir",
-                    new CodeSnippetExpression("dir.CreateSubdirectory(e.Attribute(\"Name\").Value)")));
+                    new CodeSnippetExpression("dir.CreateSubdirectory(name)")));
             ifstat.TrueStatements.Add(
                 new CodeSnippetStatement("CopyFiles(e, sdir, zip);"));
 
-            ifstat2 = 
+            ifstat2 =
                 new CodeConditionStatement(
                     new CodeSnippetExpression("e.Name.LocalName == \"Plugin\""));
             ifstat.FalseStatements.Add(ifstat2);
 
             //TODO
-            //ifstat2.TrueStatements.Add(
-                
-            //    )
-
-            ifstat2.FalseStatements.Add(
+            ifstat2.TrueStatements.Add(
                 new CodeVariableDeclarationStatement(
-                    "String", "name",
-                    new CodeSnippetExpression("e.Attribute(\"Name\").Value")));
-
-            var forstat2 =
-                new CodeIterationStatement(
-                    new CodeVariableDeclarationStatement(
-                        "IEnumerator<ZipArchiveEntry>", "itor",
-                        new CodeSnippetExpression("zip.Entries.GetEnumerator()")),
-                    new CodeSnippetExpression("itor.MoveNext()"),
-                    new CodeSnippetStatement(""),
-                    new CodeSnippetStatement("ZipArchiveEntry ent = itor.Current;"));
-            ifstat2.FalseStatements.Add(forstat2);
+                    "DirectoryInfo", "sdir",
+                    new CodeSnippetExpression("dir.CreateSubdirectory(name)")));
+            ifstat2.TrueStatements.Add(
+                new CodeSnippetStatement("Unzip(zip.GetEntry(name).Open(), sdir);"));
 
             var ifstat3 =
                 new CodeConditionStatement(
-                    new CodeSnippetExpression("ent.Name == name"));
-            forstat2.Statements.Add(ifstat3);
+                    new CodeSnippetExpression("e.Name.LocalName == \"Module\""));
+            ifstat2.FalseStatements.Add(ifstat3);
 
             ifstat3.TrueStatements.Add(
                 new CodeVariableDeclarationStatement(
-                    "Stream", "source",
-                    new CodeSnippetExpression("ent.Open()")));
-
-            var ifstat4 =
-                new CodeConditionStatement(
-                    new CodeSnippetExpression("e.Attribute(\"Build\") != null && Boolean.Parse(e.Attribute(\"Build\").Value)"));
-            ifstat3.TrueStatements.Add(ifstat4);
-
-            ifstat4.TrueStatements.Add(
-                new CodeSnippetStatement("UnzipDllx(source, dir);"));
-            ifstat4.FalseStatements.Add(
-                new CodeVariableDeclarationStatement(
-                    "Stream", "target",
-                    new CodeSnippetExpression("File.Open(dir.FullName + \"\\\\\" + name, FileMode.Create)")));
-            ifstat4.FalseStatements.Add(
-                new CodeSnippetStatement("source.CopyTo(target);"));
-            ifstat4.FalseStatements.Add(
-                new CodeSnippetStatement("target.Dispose();"));
-
+                    "String", "dllname",
+                    new CodeSnippetExpression("name + \".dll\"")));
             ifstat3.TrueStatements.Add(
-                new CodeSnippetStatement("source.Dispose();"));
-            ifstat3.TrueStatements.Add(
-                new CodeSnippetStatement("break;"));
+                new CodeSnippetStatement("Copy(zip.GetEntry(dllname), dir.FullName + \"\\\\\" + dllname);"));
+
+            ifstat3.FalseStatements.Add(
+                new CodeSnippetStatement("Copy(zip.GetEntry(name), dir.FullName + \"\\\\\" + name);"));
 
             //添加引用
             var asslst = pars.ReferencedAssemblies;
+            asslst.Add("mscorlib.dll");
             asslst.Add("System.dll");
             asslst.Add("System.Core.dll");
             asslst.Add("Microsoft.CSharp.dll");
@@ -638,7 +612,8 @@ namespace NFox.Pycad
             return cr.Errors.Count == 0;
         }
 
-    #endregion
+
+        #endregion
 
     }
 

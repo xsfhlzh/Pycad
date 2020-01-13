@@ -26,7 +26,7 @@ namespace NFox.Pycad
             get { return _path ?? $"{Parent.Path}\\{Name}"; }
         }
 
-        public bool IsRoot { get { return this == Engine.Instance.Extensions; } }
+        public bool IsRoot { get { return this == Engine.Extensions; } }
 
         public virtual bool IsModule { get { return true; } }
 

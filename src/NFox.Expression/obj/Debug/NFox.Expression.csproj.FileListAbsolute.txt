@@ -63,3 +63,5 @@ D:\Pycad\Src\NFox.Expression\obj\Debug\NFox.Expression.Properties.Resources.reso
 D:\Pycad\Src\NFox.Expression\obj\Debug\NFox.Expression.csproj.GenerateResource.Cache
 D:\Pycad\Src\NFox.Expression\obj\Debug\NFox.Expression.dll
 D:\Pycad\Src\NFox.Expression\obj\Debug\NFox.Expression.pdb
+D:\Pycad\extensions\parts\data\NFox.Expression.dll
+D:\Pycad\extensions\parts\data\NFox.Expression.pdb

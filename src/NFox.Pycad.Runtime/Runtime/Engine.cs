@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using System.Xml.Linq;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace NFox.Pycad
 {
@@ -23,110 +24,19 @@ namespace NFox.Pycad
 
         #region Extensions
 
-        public Extension Extensions { get; set; }
+        public static ExtensionCollection Extensions { get; set; }
 
-        private void ImportSpecModules(Extension p, string modules)
+        public static Package Support { get; set; }
+
+        public static List<Assembly> Assemblies { get; set; }
+
+        public static void LoadExtensions(bool loadfirst)
         {
-            try
-            {
-                foreach (dynamic name in Execute($"{p.Name}.{modules}"))
-                    TryImport($"{p.Name}.{name}");
-            }
-            catch { }
-        }
-
-        private void Regist(Extension ext)
-        {
-
-            if (ext.Type != Extension.ExtensionType.Extension)
-                return;
-
-            var filenames = new List<string>();
-            ext.GetFileNames(filenames);
-
-            var funcs =
-                new Dictionary<string, List<dynamic>>
-                {
-                    { "command", new List<dynamic>() },
-                    { "panel", new List<dynamic>() },
-                    { "lisp", new List<dynamic>() },
-                };
-            var len = ext.Directory.FullName.Length;
-
-            string content = null;
-            Regex r = null;
-
-            foreach (var path in filenames)
-            {
-                if (!path.EndsWith(".py"))
-                    continue;
-                using (StreamReader sr = new StreamReader(path))
-                {
-                    string modname = ext.Name + path.Substring(len, path.Length - len - 3);
-                    modname = modname.Replace("\\", ".");
-                    if (modname.EndsWith(".__init__"))
-                        modname = modname.Substring(0, modname.Length - 9);
-                    content = sr.ReadToEnd();
-                    r = new Regex(@"(?:\n|^)@(command|lisp|panel)\((.*?)\)\s+(?:@.*?\s+)*(?:def|class)\s+(.*?)\s*[\(:]");
-                    var ms = r.Matches(content);
-                    foreach (Match m in ms)
-                    {
-                        funcs[m.Groups[1].Value].Add(
-                            new
-                            {
-                                name = modname + "." + m.Groups[3].Value,
-                                pars = m.Groups[2].Value.Replace('"', '\'')
-                            });
-                    }
-                }
-            }
-
-            using (var sr = new StreamReader(ext.File.FullName))
-                content = sr.ReadToEnd();
-
-            r = new Regex(@"(?:\n|^)(commands|lisps|panels)\s*=\s*{(\s+(.*)\s*:\s*(.*))+\s*}");
-            if (r.IsMatch(content))
-                content = r.Replace(content, "");
-
-            using (StreamWriter sw = new StreamWriter(ext.File.FullName, false, System.Text.Encoding.UTF8))
-            {
-                sw.Write(content);
-                foreach (var kv in funcs)
-                {
-                    if (kv.Value.Count > 0)
-                    {
-                        sw.Write(kv.Key + "s = {\n");
-                        foreach (var func in kv.Value)
-                            sw.Write($"    \"{func.name}\": \"{func.pars}\",\n");
-                        sw.Write("}\n");
-                    }
-                }
-            }
-        }
-
-        public void LoadExtensions(bool loadfirst)
-        {
-
-            Extensions = new Extension("所有项目", DirectoryEx.Extensions);
-
-            if (!loadfirst)
-            {
-                foreach (Extension ext in Extensions.Packages)
-                    Regist(ext);
-            }
-
-            foreach (Extension p in Extensions.Packages)
-            {
-                if (p.Type == Extension.ExtensionType.CompiledExtension)
-                {
-                    if (File.Exists(p.Path))
-                    {
-                        var code = $"clr.AddReferenceToFileAndPath('{p.Path}/{p.Name}.dll')";
-                        Execute(code.Replace("\\", "/"));
-                    }
-                }
-                TryImport(p.Name);
-            }
+            Extensions = new ExtensionCollection("所有项目");
+            Support = new Package(DirectoryEx.Support, true);
+            foreach (var ext in Extensions)
+                try { ext.Init(loadfirst); }
+                catch { }
         }
 
         #endregion
@@ -159,9 +69,11 @@ namespace NFox.Pycad
                 paths.Add(DirectoryEx.Bin.FullName);
                 paths.Add(DirectoryEx.Support.FullName);
                 paths.Add(DirectoryEx.PythonLib.FullName);
-                paths.Add(DirectoryEx.Extensions.FullName);
                 _engine.SetSearchPaths(paths);
                 _scope = _engine.CreateScope();
+
+                foreach(var assem in Assemblies)
+                    _engine.Runtime.LoadAssembly(assem);
 
                 _values = new Dictionary<string, dynamic>();
 
@@ -175,11 +87,16 @@ namespace NFox.Pycad
 
         }
 
+        public ScriptScope CreateScope()
+        {
+            return _engine.CreateScope();
+        }
+
         private bool _loaded;
         private void Unload()
         {
-            foreach (Extension p in Extensions.Packages)
-                ImportSpecModules(p, "unloads"); 
+            foreach (Extension p in Extensions)
+                TryImport($"{p.Name}.unloads"); 
         }
 
         public void Restart()
@@ -193,11 +110,6 @@ namespace NFox.Pycad
             var paths = _engine.GetSearchPaths();
             paths.Add(path);
             _engine.SetSearchPaths(paths);
-        }
-
-        public void LoadAssembly(Assembly assem)
-        {
-            _engine.Runtime.LoadAssembly(assem);
         }
 
         #region Import
@@ -299,6 +211,17 @@ namespace NFox.Pycad
 
         #region Exec
 
+        public void AddBuiltin(string name, object value)
+        {
+            var builtin = _engine.GetBuiltinModule();
+            builtin.SetVariable(name, value);
+        }
+
+        public void LoadAssembly(Assembly assem)
+        {
+            _engine.Runtime.LoadAssembly(assem);
+        }
+
         public dynamic Execute(string code)
         {
             ScriptSource script =
@@ -342,7 +265,11 @@ namespace NFox.Pycad
 
         public void SetTrace(TracebackDelegate func)
         {
-            _engine.SetTrace(func);
+            foreach (var ext in Extensions)
+            {
+                if (ext.Engine != null)
+                    ext.Engine._engine.SetTrace(func);
+            }
         }
 
         public void TryReference(string dllname)
@@ -350,30 +277,18 @@ namespace NFox.Pycad
             TryExecute($"import clr;clr.AddReference('{dllname}')");
         }
 
-        public dynamic CreateScope()
-        {
-            return _engine.CreateScope();
-        }
-
-        public dynamic ExecuteFile(string path, bool createscope = false)
+        public dynamic ExecuteFile(string path)
         {
             ScriptSource script =
                _engine.CreateScriptSourceFromFile(path);
-            return script.Execute(createscope ? _engine.CreateScope() : _scope);
-        }
-
-        public dynamic ExecuteFile(string path, ScriptScope scope)
-        {
-            ScriptSource script =
-               _engine.CreateScriptSourceFromFile(path);
-            return script.Execute(scope);
+            return script.Execute(_scope);
         }
 
         #endregion
 
         #region Build
-
-        public void Release(string name, List<Extension> extensions)
+        
+        public void Release(IEnumerable<Extension> extensions)
         {
             string path = $"{DirectoryEx.Temp.FullName}\\Release.zip";
             using (var target = new FileStream(path, FileMode.Create))
@@ -387,8 +302,11 @@ namespace NFox.Pycad
                     CopyFiles(xe, DirectoryEx.Root, zip);
                     foreach (var e in extensions)
                     {
-                        using (var stream = zip.CreateEntry($"update\\extensions\\{e.Name}").Open())
-                            Build(e.Name, stream);
+                        if (e.Name != "pycad")
+                        {
+                            using (var stream = zip.CreateEntry($"extensions\\{e.Name}").Open())
+                                e.Build(stream);
+                        }
                     }
                 }
             }
@@ -399,47 +317,46 @@ namespace NFox.Pycad
             foreach (var e in xe.Elements())
             {
                 string name = e.Attribute("Name").Value;
-                if (e.Name == "Directory")
+                switch (e.Name.LocalName)
                 {
-                    CopyFiles(e, dir.GetDirectory(name), zip);
-                }
-                else if (e.Name == "Plugin")
-                {
-                    var plugin = PluginBase.GetPlugin(e.Attribute("Name").Value);
-                    using (var stream = zip.CreateEntry($"update\\plugins\\{e.Attribute("Name").Value}").Open())
-                    {
-                        using (var pzip = new ZipArchive(stream, ZipArchiveMode.Update))
+                    case "Directory":
+                        CopyFiles(e, dir.GetDirectory(name), zip);
+                        break;
+                    case "Plugin":
+                        var plugin = PluginBase.GetPlugin(name);
+                        using (var stream = zip.CreateEntry(name).Open())
                         {
-                            var pdir = plugin.Info.Directory;
-                            int len = pdir.FullName.Length;
-                            foreach (var file in pdir.GetAllFiles())
+                            using (var pzip = new ZipArchive(stream, ZipArchiveMode.Update))
                             {
-                                using (var target = pzip.CreateEntry(file.FullName.Substring(len + 1)).Open())
+                                var pdir = plugin.Info.Directory;
+                                int len = pdir.FullName.Length;
+                                foreach (var file in pdir.GetAllFiles())
                                 {
-                                    using (var source = file.OpenRead())
-                                        source.CopyTo(target);
+                                    using (var target = pzip.CreateEntry(file.FullName.Substring(len + 1)).Open())
+                                    {
+                                        using (var source = file.OpenRead())
+                                            source.CopyTo(target);
+                                    }
                                 }
                             }
                         }
-                    }
-
-                }
-                else
-                {
-                    if (e.Attribute("Build") != null && bool.Parse(e.Attribute("Build").Value))
-                    {
-                        using (var stream = zip.CreateEntry($"update\\{e.Attribute("Name").Value}").Open())
-                            Build(name, stream);
-                    }
-                    else
-                    {
-                        using (var stream = zip.CreateEntry($"update\\{name}").Open())
+                        break;
+                    case "Module":
+                        using (var stream = zip.CreateEntry($"{name}.dll").Open())
+                            Support.Packages[name].Build(stream);
+                        break;
+                    case "Extension":
+                        using (var stream = zip.CreateEntry($"extensions\\{name}").Open())
+                            Extensions[name].Build(stream);
+                        break;
+                    case "File":
+                        using (var stream = zip.CreateEntry(name).Open())
                         {
                             var file = dir.GetFile(name);
                             using (FileStream source = file.OpenRead())
                                 source.CopyTo(stream);
                         }
-                    }
+                        break;
                 }
             }
         }
@@ -459,39 +376,6 @@ namespace NFox.Pycad
             {
                 CopyAllDataFiles(sdir, zip, $"{path}{sdir.Name}\\");
             }
-        }
-
-        public void Build(string name, Stream stream)
-        {
-
-            var project = Extensions.GetExtension(name);
-            if (project == null)
-                project = new Extension(DirectoryEx.Support.GetDirectory(name));
-
-            using (ZipArchive zip = new ZipArchive(stream, ZipArchiveMode.Update))
-            {
-
-                CopyAllDataFiles(project.DataDirectory, zip, "data\\");
-                string targetpath = $"{DirectoryEx.Temp.FullName}\\{name}.dll";
-                List<string> names = new List<string>();
-                project.GetFileNames(names);
-                var code = $"clr.CompileModules('{targetpath}',{string.Join(",", names.Select(s => $"'{s}'"))});";
-                Execute(code.Replace("\\", "/"));
-                var dllfile = new FileInfo(targetpath);
-                using (var target = zip.CreateEntry($"{name}.dll").Open())
-                {
-                    using (var source = dllfile.OpenRead())
-                        source.CopyTo(target);
-                }
-                dllfile.Delete();
-            }
-
-        }
-
-        public void Build(string name, string path)
-        {
-            using (var fs = File.Create(Path.Combine(path, name + ".prj")))
-                Build(name, fs);
         }
 
         #endregion
