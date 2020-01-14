@@ -1,6 +1,7 @@
 ﻿from pycad.system import *
 from pycad.runtime import *
 
+
 @command()
 def helloworld(doc):
     #显示hello world!
@@ -11,6 +12,7 @@ def helloworld(doc):
         btr = tr.opencurrspace()
         #向当前空间添加直线
         tr.addentity(btr, acdb.Line(acge.Point3d(0,0,0), acge.Point3d(10,10,0)))
+
 
 @command()
 def mtexttest(doc):
@@ -25,6 +27,7 @@ def mtexttest(doc):
         mt.Attachment = acdb.AttachmentPoint.BottomCenter
         #向当前空间添加
         tr.addentity(tr.opencurrspace(), mt)
+
 
 @command()
 def mtexttest2(doc):
@@ -41,6 +44,7 @@ def mtexttest2(doc):
             elif isinstance(txt, acdb.MText):
                 txt.Contents = 'abc'
 
+
 @command()
 def randtest(doc):
     #生成1w个测试点
@@ -50,6 +54,7 @@ def randtest(doc):
         r = Random(Guid.NewGuid().GetHashCode())
         for i in range(10000):
             tr.addentity(btr, acdb.DBPoint(acge.Point3d(r.Next(0, 1000), r.Next(0, 1000), 0)))
+
 
 @command()
 @showtime
@@ -69,6 +74,7 @@ def mycir(doc):
         btr.DowngradeOpen()
         tr.Commit()
 
+
 @command()
 @showtime
 def mycir2(doc):
@@ -81,27 +87,28 @@ def mycir2(doc):
             for i in range(100000))
         tr.addentity(btr, *cirs)
 
+
 @command()
 @showtime
 def mycir3(doc):
     #测试使用多事务生成10W个随机圆的时间
-    db = doc.Database #type: acdb.Database
+    db = doc.Database  #type: acdb.Database
     from random import uniform
     cirs = (
         acdb.Circle(acge.Point3d(uniform(0, 10000), uniform(0, 10000), 0), acge.Vector3d.ZAxis, 2)
         for i in range(100000))
     for cir in cirs:
         with db.TransactionManager.StartTransaction() as tr:
-            btr = tr.GetObject(db.CurrentSpaceId, acdb.OpenMode.ForRead) #type: acdb.BlockTableRecord
+            btr = tr.GetObject(db.CurrentSpaceId, acdb.OpenMode.ForRead)  #type: acdb.BlockTableRecord
             btr.UpgradeOpen()
             btr.AppendEntity(cir)
             tr.AddNewlyCreatedDBObject(cir, True)
             btr.DowngradeOpen()
             tr.Commit()
 
+
 @command()
 def myline(doc):
-    ed = doc.Editor  #type: aced.Editor
     with dbtrans(doc) as tr:
         #获取起点
         respt = edx.getpoint('指定第一个点:')
@@ -124,6 +131,7 @@ def myline(doc):
             #获取下一点
             opts.BasePoint = start = end
             respt2 = edx.getpoint(opts)
+
 
 @command()
 def myline2(doc):
@@ -174,6 +182,7 @@ def myline2(doc):
                         del lines[-1]
                 else: break
 
+
 @command()
 def mypl3d(doc):
     #获取图元时按类型过滤
@@ -187,8 +196,3 @@ def mypl3d(doc):
         #遍历三维多段线, 显示折点坐标
         for i in pl:
             print(tr.getobject(i).Position)
-
-
-
-
-

@@ -1,6 +1,7 @@
 ﻿from pycad.system import *
 from pycad.runtime import *
 
+
 @command()
 def cstest(doc):
     with cs.opencprofile() as cpf:
@@ -12,15 +13,17 @@ def cstest(doc):
         if not m:
             print(';'.join((tpaths, s)))
 
+
 @command(lock=False)
 def switchtotest(doc):
-    ed = doc.Editor #type: aced.Editor
+    ed = doc.Editor  #type: aced.Editor
     if doc.Database.TileMode: ed.SwitchToPaperSpace()
     else: ed.SwitchToModelSpace()
 
+
 @command()
 def cmdtest(doc):
-    ed = doc.Editor #type: aced.Editor
+    ed = doc.Editor  #type: aced.Editor
     from random import uniform
     ed.Command(
         '._line',
@@ -34,6 +37,7 @@ def cmdtest(doc):
         '')
     print('\nOK!')
 
+
 @command()
 def dbxtest(doc):
     filename = 'd:\\test.dwg'
@@ -41,7 +45,7 @@ def dbxtest(doc):
         btr = tr.openmodelspace()
         mat = acge.Matrix3d.Displacement(acge.Vector3d(10,0,0))
         for i in btr:
-            ent = tr.getobject(i) #type: acdb.Entity
+            ent = tr.getobject(i)  #type: acdb.Entity
             with upopen(ent):
                 case = switch(ent)
                 if case[acdb.Line]:
@@ -68,6 +72,7 @@ class clstest:
     def func(self):
         print("gcad", -1)
 
+
 def pickfirst_changed(sender, e):
     #事件的触发者即当前文档
     ed = sender.Editor  #type: aced.Editor
@@ -78,9 +83,11 @@ def pickfirst_changed(sender, e):
     else:
         ed.WriteMessage("0")
 
+
 def doc_created(sender, e):
     #新文档创建后,绑定ImpliedSelectionChanged事件
     e.Document.ImpliedSelectionChanged += pickfirst_changed
+
 
 @command()
 def showpickfirstinfo(doc):
@@ -91,6 +98,7 @@ def showpickfirstinfo(doc):
     for d in docs:
         #遍历已有文档,绑定ImpliedSelectionChanged事件
         d.ImpliedSelectionChanged += pickfirst_changed
+
 
 @command()
 def unshowpickfirstinfo(doc):

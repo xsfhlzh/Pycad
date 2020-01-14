@@ -6,6 +6,7 @@ clr.AddReference('System')
 from System.Windows.Forms import *
 from System.Drawing import *
 
+
 class TPanel(UserControl):
     def __init__(self, text='hello world', width=500, height=400):
         self.btnSave = Button()
@@ -15,21 +16,21 @@ class TPanel(UserControl):
         self.Text = text
         self.Size = Size(width, height)
         self.StartPosition = FormStartPosition.CenterScreen
-        self.__initControls();      
+        self.__initControls()
 
     def __initControls(self):
         self.btnSave.Text = "&Save"
-        self.btnSave.Location = Point(10, 10);     
+        self.btnSave.Location = Point(10, 10)
 
         self.btnExit.Text = "E&xit"
-        self.btnExit.Location = Point(self.btnSave.Left+self.btnSave.Width+10, self.btnSave.Top)
+        self.btnExit.Location = Point(self.btnSave.Left + self.btnSave.Width + 10, self.btnSave.Top)
         self.btnExit.Click += self.__btnExit_Click
 
         self.btnOpen.Text = "&Open"
-        self.btnOpen.Location = Point(self.btnExit.Left+self.btnExit.Width+10, self.btnSave.Top)
+        self.btnOpen.Location = Point(self.btnExit.Left + self.btnExit.Width + 10, self.btnSave.Top)
         self.btnOpen.Click += self.__btnOpen_Click
 
-        self.txtBox.Location = Point(self.btnSave.Left, self.btnExit.Height + self.btnExit.Top+10)
+        self.txtBox.Location = Point(self.btnSave.Left, self.btnExit.Height + self.btnExit.Top + 10)
         self.txtBox.Width = 470
         self.txtBox.Height = 320
         self.txtBox.Multiline = True
@@ -39,7 +40,7 @@ class TPanel(UserControl):
         self.Controls.Add(self.btnSave)
         self.Controls.Add(self.btnExit)
         self.Controls.Add(self.btnOpen)
-        self.Controls.Add(self.txtBox)  
+        self.Controls.Add(self.txtBox)
 
     def __btnExit_Click(self, sender, e):
         self.Close()

@@ -1,6 +1,7 @@
 ﻿from pycad.system import *
 from pycad.runtime import *
 
+
 @command()
 def myxdata(doc):
     with dbtrans(doc) as tr:
@@ -14,12 +15,14 @@ def myxdata(doc):
         #添加Xdata
         tr.addregapp('MyXdata')
         bref.XData = conv.ToBuffer(((1001, 'MyXdata'), (1000, 'test')))
-        
+
+
 @command()
 def myxdata2(doc):
     #按Xdata程序名过滤图元
     ss = edx.ssget_x(filters=(1001, 'MyXdata'))
     print(len(ss))
+
 
 class mydata(serializable):
 
@@ -51,6 +54,7 @@ class mydata(serializable):
     def Info(self): return self._info
     @Info.setter
     def Info(self, value): self._info = value
+
 
 @command()
 def deserializetest(doc):

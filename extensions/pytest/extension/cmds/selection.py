@@ -1,6 +1,7 @@
 ﻿from pycad.system import *
 from pycad.runtime import *
 
+
 @command(flags=acrx.CommandFlags.UsePickSet)
 def comtest(doc):
     #com方式获取图元图像
@@ -10,6 +11,7 @@ def comtest(doc):
     try: acdoc.SelectionSets['CURRENT'].Delete()
     except: pass
     acdoc.Export('d:\\1', 'wmf', acdoc.ActiveSelectionSet)
+
 
 @command()
 def myss1(doc):
@@ -22,6 +24,7 @@ def myss1(doc):
     ss = edx.ssget_w(respt.value, rescor.value, ((0, 'line'), (8, '0')))
     if ss.ok(): edx.sssetfirst(tuple(ss))
 
+
 @command()
 def myss2(doc):
     with dbtrans(doc) as tr:
@@ -31,6 +34,7 @@ def myss2(doc):
             if _.ObjectClass.DxfName == 'LINE')
         edx.sssetfirst(ids)
 
+
 @command()
 def myss3(doc):
     ss = edx.ssget(":E:S")
@@ -39,4 +43,3 @@ def myss3(doc):
     if ss.cancel(): return
     with dbtrans(doc) as tr:
         print(tr.getobject(ss[0].ObjectId))
-

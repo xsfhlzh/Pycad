@@ -1,5 +1,0 @@
-{
-    "files.autoGuessEncoding": false,
-    "python.autoComplete.extraPaths": ["..\\clrclasses", "..\\pycadsys"],
-    "python.pythonPath": "C:\\Program Files\\Python37"
-}

@@ -6,6 +6,7 @@ import clr
 import System
 clr.ImportExtensions(System.Linq)
 
+
 @lisp()
 @showtime
 def mylisp(doc, args):
@@ -13,11 +14,13 @@ def mylisp(doc, args):
     from System.Diagnostics import Process
     return [x.ProcessName for x in Process.GetProcesses()]
 
+
 @lisp()
 def mylisp0(doc, args):
     for lispdata in args[0]:
         print(lispdata)
     return args[0][0]
+
 
 @lisp()
 @showtime
@@ -25,14 +28,16 @@ def mylisp1(doc, args):
     import random, string
     strs = [
         ''.join(
-            random.choice(string.ascii_lowercase) 
-            for _ in range(500)) 
+            random.choice(string.ascii_lowercase)
+            for _ in range(500))
         for _ in range(10000)]
     return strs
+
 
 @lisp()
 def mylisp2(doc, args):
     return sum(args)
+
 
 @lisp()
 def mylisp3(doc, args):
@@ -40,9 +45,11 @@ def mylisp3(doc, args):
     acapp.ShowModalDialog(WpfTestForm())
     return utils.getvalue('WpfTestForm')
 
+
 @lisp()
 def mylisp4(doc, args):
     return [1,[2,3],4,[5,6,[7,8,[9]]]]
+
 
 @lisp()
 def clipboard(doc, args):

@@ -4,6 +4,7 @@ from pycad.runtime import *
 import clr, System
 clr.ImportExtensions(System.Linq)
 
+
 @command(flags=acrx.CommandFlags.UsePickSet)
 def linqtest(doc):
     #linq去重,留下同心圆中直径最小的
@@ -18,6 +19,7 @@ def linqtest(doc):
             .GroupBy(lambda c: c.Center)
             .SelectMany(lambda cs: cs.OrderBy(lambda c: c.Radius).Skip(1)))
         tr.erase(*cirs)
+
 
 @command()
 def linqtest2(doc):

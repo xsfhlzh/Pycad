@@ -87,68 +87,51 @@ namespace NFox.Pycad
             else
             {
 
+                Funcs = 
+                    new JObject(
+                        new JProperty("commands", new JObject()),
+                        new JProperty("lisps", new JObject()),
+                        new JProperty("panels", new JObject()));
+
+                var len = CodeDirectory.FullName.Length + 1;
                 var filenames = new List<string>();
                 GetFileNames(filenames);
-
-                var funcs =
-                    new Dictionary<string, List<dynamic>>
-                    {
-                        { "command", new List<dynamic>() },
-                        { "panel", new List<dynamic>() },
-                        { "lisp", new List<dynamic>() },
-                    };
-                var len = CodeDirectory.FullName.Length + 1;
-
-                string content = null;
-                Regex r = null;
-
                 foreach (var path in filenames)
                 {
-                    if (!path.EndsWith(".py"))
-                        continue;
+
+                    if (!path.EndsWith(".py")) continue;
+                    string modulename = path.Substring(len, path.Length - len - 3);
+                    modulename = modulename.Replace("\\", ".");
+                    if (modulename == "__init__")
+                    {
+                        modulename = "";
+                    }
+                    else
+                    {
+                        if (modulename.EndsWith(".__init__"))
+                            modulename = modulename.Substring(0, modulename.Length - 9);
+                        modulename = "." + modulename;
+                    }
+
                     using (StreamReader sr = new StreamReader(path))
                     {
-                        string modulename = path.Substring(len, path.Length - len - 3);
-                        modulename = modulename.Replace("\\", ".");
-                        if (modulename == "__init__")
-                            modulename = "";
-                        else
-                        {
-                            if (modulename.EndsWith(".__init__"))
-                                modulename = modulename.Substring(0, modulename.Length - 9);
-                            modulename = "." + modulename;
-                        }
-                        content = sr.ReadToEnd();
-                        r = new Regex(@"(?:\n|^)@(command|lisp|panel)\((.*?)\)\s+(?:@.*?\s+)*(?:def|class)\s+(.*?)\s*[\(:]");
-                        var ms = r.Matches(content);
+                        Regex r = new Regex(@"(?:\n|^)@(command|lisp|panel)\((.*?)\)\s+(?:@.*?\s+)*(?:def|class)\s+(.*?)\s*[\(:]");
+                        var ms = r.Matches(sr.ReadToEnd());
                         foreach (Match m in ms)
                         {
-                            funcs[m.Groups[1].Value].Add(
-                                new
-                                {
-                                    modulename = modulename,
-                                    name = m.Groups[3].Value,
-                                    pars = m.Groups[2].Value.Replace('"', '\'')
-                                });
+                            var type = $"{m.Groups[1].Value}s";
+                            var items = Funcs[type];
+                            if (items[modulename] == null)
+                                items.Add(new JProperty(modulename, new JObject()));
+                            items[modulename].Add(
+                                new JProperty(
+                                    m.Groups[3].Value,
+                                    m.Groups[2].Value.Replace('"', '\'')));
                         }
                     }
                 }
 
-                Funcs = new JObject();
-                foreach (var items in funcs)
-                {
-                    JObject obj = new JObject();
-                    foreach (var g in items.Value.GroupBy(i => i.modulename))
-                    {
-                        JObject gobj = new JObject();
-                        foreach (var item in g)
-                            gobj.Add(new JProperty(item.name, item.pars));
-                        obj.Add(new JProperty(g.Key, gobj));
-                    }
-                    JProperty prop = new JProperty($"{items.Key}s", obj);
-                    Funcs.Add(prop);
-                }
-
+                //保存命令到配置文件
                 new Action(() =>
                 {
                     var settings = Directory.GetFileFullName("funcs.json");
@@ -162,22 +145,24 @@ namespace NFox.Pycad
                         }
                     }
                 }).BeginInvoke(null, null);
+
             }
 
+            //预加载各模块以加快命令运行速度
             if (Application.CurrSystem != "acore")
             {
                 new Action(() =>
                 {
-                    foreach (var cmds in Funcs)
+                    foreach (var items in Funcs)
                     {
-                        foreach (var module in cmds.Value)
+                        foreach (var module in items.Value)
                             Engine.TryImport($"extension{module.Name}");
                     }
                 }).BeginInvoke(null, null);
             }
         }
 
-        public void CopyAllDataFiles(DirectoryInfo dir, ZipArchive zip, string path)
+        private void CopyAllDataFiles(DirectoryInfo dir, ZipArchive zip, string path)
         {
             if (dir == null) return;
             foreach (var file in dir.GetFiles())
@@ -201,11 +186,9 @@ namespace NFox.Pycad
 
                 foreach (var file in Directory.GetFiles())
                 {
+                    using (var source = file.OpenRead())
                     using (var target = zip.CreateEntry(file.Name).Open())
-                    {
-                        using (var source = file.OpenRead())
-                            source.CopyTo(target);
-                    }
+                        source.CopyTo(target);
                 }
 
                 if (DataDirectory != null)
@@ -224,38 +207,31 @@ namespace NFox.Pycad
             string json = Directory.GetFileFullName("package.json");
             if (!System.IO.File.Exists(json))
                 CreatePackageJson(json);
+            json = Directory.GetFileFullName("funcs.json");
+            if (!System.IO.File.Exists(json))
+                CreateFuncsJson(json);
             json = Directory.CreateSubdirectory(".vscode").GetFileFullName("settings.json");
             if (!System.IO.File.Exists(json))
-            {
                 CreateSettingsJson(json);
-            }
-            else
+        }
+
+        private void CreateFuncsJson(string json)
+        {
+            using (FileStream fs = new FileStream(json, FileMode.Create))
             {
-                JObject root = null;
-                using (FileStream fs = new FileStream(json, FileMode.Open))
+                using (StreamWriter sw = new StreamWriter(fs))
+                using (JsonTextWriter writer = new JsonTextWriter(sw))
                 {
-                    using (var sr = new StreamReader(fs))
-                    using (JsonTextReader reader = new JsonTextReader(sr))
-                        root = JToken.ReadFrom(reader) as JObject;
+                    writer.Formatting = Formatting.Indented;
+                    JObject root =
+                        new JObject
+                        (
+                            new JProperty("commands", new JObject()),
+                            new JProperty("lisps", new JObject()),
+                            new JProperty("panels", new JObject())
+                        );
+                    root.WriteTo(writer);
                 }
-
-                var extra = root["python.autoComplete.extraPaths"] as JArray;
-                if (!((string)extra[0]).StartsWith(DirectoryEx.Root.FullName))
-                {
-                    extra.Clear();
-                    extra.Add(DirectoryEx.Root.GetDirectory("stubs").GetDirectory("pycadsys").FullName);
-                    extra.Add(DirectoryEx.Root.GetDirectory("stubs").GetDirectory("clrclasses").FullName);
-                    using (FileStream fs = new FileStream(json, FileMode.Create))
-                    {
-                        using (StreamWriter sw = new StreamWriter(fs))
-                        using (JsonTextWriter writer = new JsonTextWriter(sw))
-                        {
-                            writer.Formatting = Formatting.Indented;
-                            root.WriteTo(writer);
-                        }
-                    }
-                }
-
             }
         }
 
@@ -267,10 +243,13 @@ namespace NFox.Pycad
                 using (JsonTextWriter writer = new JsonTextWriter(sw))
                 {
                     writer.Formatting = Formatting.Indented;
-                    JObject root = new JObject();
-                    root.Add(new JProperty("name", Name));
-                    root.Add(new JProperty("author", ""));
-                    root.Add(new JProperty("dependencies", new JObject()));
+                    JObject root = 
+                        new JObject
+                        (
+                            new JProperty("name", Name),
+                            new JProperty("author", ""),
+                            new JProperty("dependencies", new JObject())
+                        );
                     root.WriteTo(writer);
                 }
             }
@@ -284,17 +263,32 @@ namespace NFox.Pycad
                 using (JsonTextWriter writer = new JsonTextWriter(sw))
                 {
                     writer.Formatting = Formatting.Indented;
-                    JObject root = new JObject();
-                    root.Add(new JProperty("python.pythonPath", "C:\\Program Files\\Python37\\python.exe"));
-                    var arr = new JArray();
-                    arr.Add(DirectoryEx.Root.GetDirectory("stubs").GetDirectory("pycadsys").FullName);
-                    arr.Add(DirectoryEx.Root.GetDirectory("stubs").GetDirectory("clrclasses").FullName);
-                    root.Add(new JProperty("python.autoComplete.extraPaths", arr));
-                    root.Add(new JProperty("python.linting.enabled", true));
-                    root.Add(new JProperty("terminal.integrated.shell.windows", "C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"));
-                    arr = new JArray();
-                    arr.Add("../../bin/pyconsole.exe");
-                    root.Add(new JProperty("terminal.integrated.shellArgs.windows", arr));
+                    JObject root =
+                        new JObject
+                        (
+                            new JProperty(
+                                "python.pythonPath", 
+                                "C:\\Program Files\\Python37\\python.exe"),
+                            new JProperty(
+                                "python.autoComplete.extraPaths",
+                                new JArray(
+                                    "..\\.stubs\\pycadsys",
+                                    "..\\.stubs\\clrclasses")),
+                            new JProperty(
+                                "python.linting.flake8Enabled",
+                                true),
+                            new JProperty(
+                                "python.linting.flake8Args",
+                                new JArray(
+                                    "--ignore=E231,E262,E265,E401,E402,E501,E701,E704,E722,F403,F405,F811,W504",
+                                    "--verbose")),
+                            new JProperty(
+                                "terminal.integrated.shell.windows", 
+                                "powershell.exe"),
+                            new JProperty(
+                                "terminal.integrated.shellArgs.windows", 
+                                new JArray("..\\..\\bin\\pyconsole.exe"))
+                        );
                     root.WriteTo(writer);
                 }
             }
@@ -304,6 +298,8 @@ namespace NFox.Pycad
         {
             var json = Directory.GetFileFullName("package.json");
             CreatePackageJson(json);
+            json = Directory.GetFileFullName("funcs.json");
+            CreateFuncsJson(json);
             json = Directory.CreateSubdirectory(".vscode").GetFileFullName("settings.json");
             CreateSettingsJson(json);
         }

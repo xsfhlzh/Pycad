@@ -3,6 +3,7 @@ from pycad.runtime import *
 
 _filename = None
 
+
 @command()
 def pyrun(doc):
     pfo = aced.PromptOpenFileOptions("选择Python脚本")
@@ -18,6 +19,7 @@ def pyrun(doc):
             _filename = pr.StringResult.rsplit('\\',1)[1]
         except: pass
 
+
 @command()
 def pyreference(doc):
     pfo = aced.PromptOpenFileOptions("选择.Net类库")
@@ -27,6 +29,7 @@ def pyreference(doc):
     if pr.Status == aced.PromptStatus.OK:
         pye.reference(pr.StringResult)
 
+
 def isvarname(name):
     b = name[0].isalpha() or name[0] == '_'
     if b:
@@ -35,7 +38,9 @@ def isvarname(name):
                 return False
     return b
 
+
 lastindex = 0
+
 
 @command()
 def pyedit(doc):
@@ -90,6 +95,7 @@ def pyedit(doc):
     elif res.keyword('O'):
         pye.open_support()
 
+
 @command()
 def pyrelease(doc):
     from ctypes import windll
@@ -124,5 +130,4 @@ def pyrelease(doc):
     opts.DefaultValue = System.Environment.MachineName
     res = edx.getstr(opts)
     if res.ok():
-        pye.release(res.value, tuple(exts[i-1] for i in sels))
-    
+        pye.release(res.value, tuple(exts[i - 1] for i in sels))

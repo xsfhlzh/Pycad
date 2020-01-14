@@ -25,7 +25,7 @@ namespace NFox.Pycad.RefTypes
 
         private const string _clrclasses = "__clrclasses__";
         private const string _initfilename = "__init__.py";
-        private readonly static DirectoryInfo _stubsroot = DirectoryEx.Root.CreateSubdirectory("stubs").CreateSubdirectory("clrclasses");
+        private readonly static DirectoryInfo _stubsroot = DirectoryEx.Stubs.CreateSubdirectory("clrclasses");
         private readonly static string _nsroot = _stubsroot.GetFileFullName("namespace.zip");
         private readonly static DirectoryInfo _clrroot = _stubsroot.CreateSubdirectory(_clrclasses);
 

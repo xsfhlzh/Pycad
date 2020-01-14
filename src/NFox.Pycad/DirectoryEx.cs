@@ -59,6 +59,9 @@ namespace NFox.Pycad
         public static DirectoryInfo Plugins { get; } = Root.GetDirectory("plugins");
         public static DirectoryInfo Support { get; } = Root.GetDirectory("support");
         public static DirectoryInfo Extensions { get; } = Root.GetDirectory("extensions");
+
+        public static DirectoryInfo Stubs { get; } = Extensions.GetDirectory(".stubs");
+
         public static FileInfo PythonLib { get; } = Bin.GetFile("Lib.zip");
         public static DirectoryInfo Temp { get; } = Root.GetDirectory("temp");
         public static DirectoryInfo Update { get; } = Root.GetDirectory("update");

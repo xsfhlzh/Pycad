@@ -1,6 +1,7 @@
 ﻿from pycad.system import *
 from pycad.runtime import *
 
+
 @command()
 def dicttest(doc):
     with dbtrans(doc) as tr:
@@ -8,6 +9,7 @@ def dicttest(doc):
         d = tr.getdict()
         d.setxrecord('NFox.Cad', [[1000, 'abc']])
         print('\n在命名字典中设置了值为%s的扩展数据' % d.getxrecord('NFox.Cad'))
+
 
 @command()
 def dicttest2(doc):
@@ -26,6 +28,7 @@ def dicttest2(doc):
         d.setxrecord('test1', [[1000, 'abc']])
         print('\n在字典中设置了值为%s的扩展数据' % d.getxrecord('test1'))
 
+
 @command()
 def dicttest3(doc):
     res = edx.entsel('\n选择一个圆')
@@ -36,6 +39,7 @@ def dicttest3(doc):
         d = tr.getdict(cir)
         d.setxrecord('NFox.Cad', [[1000, 'abc']])
         print('\n在对象字典中设置了值为%s的扩展数据' % d.getxrecord('NFox.Cad'))
+
 
 @command()
 def layertest(doc):

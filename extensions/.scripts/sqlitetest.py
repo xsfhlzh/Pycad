@@ -1,7 +1,4 @@
-﻿from pycad.system import *
-from pycad.runtime import *
-
-import sqlite3
+﻿import sqlite3
 conn = sqlite3.connect(":memory:")
 conn.execute(
     """

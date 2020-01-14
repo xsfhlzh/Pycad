@@ -14,11 +14,9 @@ from System.Drawing import Point
 from System.Windows.Controls import UserControl
 import wpf
 
-from pycad.system import findfile
-from pycad.runtime import utils
 
 class WpfTestForm(Form):
-    def __init__(self): 
+    def __init__(self):
         self.elementHost = ElementHost()
         self.elementHost.Child = UCWpfTestForm()
         self.elementHost.Location = Point(0, 0)
@@ -26,12 +24,15 @@ class WpfTestForm(Form):
         self.Controls.Add(self.elementHost)
         self.Text = "WpfTest"
 
+
 class UCWpfTestForm(UserControl):
     def __init__(self):
-        from pycad.system import pye
+        from pycad.system import findfile
         wpf.LoadComponent(self, findfile('WpfTestForm.xaml'))
+        from pycad.runtime import utils
         utils.setvalue('WpfTestForm')
 
     def Input_Button_Click(self, sender, e):
         self.InputTb.Text += sender.Content
+        from pycad.runtime import utils
         utils.setvalue('WpfTestForm', self.InputTb.Text)

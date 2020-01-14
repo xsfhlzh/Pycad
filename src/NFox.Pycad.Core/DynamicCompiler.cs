@@ -131,24 +131,24 @@ namespace NFox.Pycad
                 .ToList();
 
             int i = 0;
-            foreach (Extension prj in Engine.Extensions)
+            foreach (Extension ext in Engine.Extensions)
             {
-                if (prj.Funcs != null)
+                if (ext.Funcs != null)
                 {
-                    foreach (dynamic cmds in prj.Funcs["commands"])
+                    foreach (dynamic cmds in ext.Funcs["commands"])
                     {
                         foreach(var cmd in cmds.Value)
-                            cmdsclass.Members.Add(BuildCmdMethod(prj.Name, cmds.Name, cmd, "command", i++));
+                            cmdsclass.Members.Add(BuildCmdMethod(ext.Name, cmds.Name, cmd, "command", i++));
                     }
-                    foreach (dynamic cmds in prj.Funcs["panels"])
+                    foreach (dynamic cmds in ext.Funcs["panels"])
                     {
                         foreach (var cmd in cmds.Value)
-                            cmdsclass.Members.Add(BuildCmdMethod(prj.Name, cmds.Name, cmd, "panel", i++));
+                            cmdsclass.Members.Add(BuildCmdMethod(ext.Name, cmds.Name, cmd, "panel", i++));
                     }
-                    foreach (dynamic lisps in prj.Funcs["lisps"])
+                    foreach (dynamic lisps in ext.Funcs["lisps"])
                     {
                         foreach (var lisp in lisps.Value)
-                            cmdsclass.Members.Add(BuildLispMethod(prj.Name, lisps.Name, lisp, i++));
+                            cmdsclass.Members.Add(BuildLispMethod(ext.Name, lisps.Name, lisp, i++));
                     }
                 }
             }

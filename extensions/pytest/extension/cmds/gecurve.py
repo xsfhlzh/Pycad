@@ -1,6 +1,7 @@
 ﻿from pycad.system import *
 from pycad.runtime import *
 
+
 @command()
 def ccitest(doc):
     #新建两个ge库的直线段
@@ -13,6 +14,7 @@ def ccitest(doc):
         #显示重合信息,即重合部分的曲线参数范围
         print("%s, %s" % (overloads[0].LowerBound, overloads[0].UpperBound))
         print("%s, %s" % (overloads[1].LowerBound, overloads[1].UpperBound))
+
 
 @command()
 def ccitest2(doc):
@@ -33,6 +35,7 @@ def ccitest2(doc):
             pars = cci.GetIntersectionParameters(k)
             print(curve3d.EvaluatePoint(pars[0]))
 
+
 @command()
 def mindict(doc):
     #两曲线间最短距离
@@ -49,6 +52,7 @@ def mindict(doc):
         pocs = curves[0].GetClosestPointTo(curves[1])
         line = acdb.Line(pocs[0].Point, pocs[1].Point)
         tr.addentity(tr.opencurrspace(), line)
+
 
 @command()
 def comptest(doc):
@@ -80,16 +84,19 @@ def comptest(doc):
         newcurve3d = acge.CompositeCurve3d(tuple(curves))
         tr.addentity(tr.opencurrspace(), gex.conv_to_db(newcurve3d))
 
+
 def get_intersection_params(cci):
     return [
-        cci.GetIntersectionParameters(i) 
+        cci.GetIntersectionParameters(i)
         for i in range(cci.NumberOfIntersectionPoints)]
+
 
 def get_overload_ranges(cci):
     for i in range(cci.OverlapCount()):
         overloads = cci.GetOverlapRanges(i)
         for j in range(2):
             yield (overloads[j].LowerBound, overloads[j].UpperBound)
+
 
 @command()
 def linetest(doc):
@@ -99,7 +106,7 @@ def linetest(doc):
     res2 = edx.entsel("\n请选择第二条直线:")
     if not res2.ok(): return
     with dbtrans(doc) as tr:
-        line1 = tr.getobject(res.ObjectId) #type: acdb.Line
-        line2 = tr.getobject(res2.ObjectId) #type: acdb.Line
+        line1 = tr.getobject(res.ObjectId)  #type: acdb.Line
+        line2 = tr.getobject(res2.ObjectId)  #type: acdb.Line
         #用向量判断是否平行
         print(line1.Delta.IsParallelTo(line2.Delta))

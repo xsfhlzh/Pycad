@@ -62,11 +62,6 @@
       "deserializetest": ""
     }
   },
-  "panels": {
-    ".panels": {
-      "showpanel": "'testpanel'"
-    }
-  },
   "lisps": {
     ".lisps": {
       "mylisp": "",
@@ -76,6 +71,11 @@
       "mylisp3": "",
       "mylisp4": "",
       "clipboard": ""
+    }
+  },
+  "panels": {
+    ".panels": {
+      "showpanel": "'testpanel'"
     }
   }
 }

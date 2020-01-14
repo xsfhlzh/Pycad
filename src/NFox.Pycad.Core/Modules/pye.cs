@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text.RegularExpressions;
+using Microsoft.Win32;
 
 namespace NFox.Pycad.Core.Modules
 {
@@ -73,7 +70,16 @@ namespace NFox.Pycad.Core.Modules
         {
             var pro = new System.Diagnostics.Process();
             pro.EnableRaisingEvents = false;
-            pro.StartInfo.FileName = getvar("editor.path");
+            var rpath = 
+                Registry.ClassesRoot
+                .OpenSubKey("*")?
+                .OpenSubKey("shell")?
+                .OpenSubKey("VSCode")?
+                .GetValue("Icon")?
+                .ToString();
+            if (rpath != null && !File.Exists(rpath))
+                rpath = null;
+            pro.StartInfo.FileName = rpath ?? getvar("editor.path");
             pro.StartInfo.Arguments = $"\"{path}\\\"";
             pro.Start();
         } 

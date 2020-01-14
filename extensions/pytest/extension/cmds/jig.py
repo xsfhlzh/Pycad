@@ -1,6 +1,7 @@
 ﻿from pycad.system import *
 from pycad.runtime import *
 
+
 @command()
 def testblockjig(doc):
     with dbtrans(doc) as tr:
@@ -10,6 +11,7 @@ def testblockjig(doc):
         tr.addentity(btr, bref)
         tr.dragblock(bref)
 
+
 @command()
 def testcirjig(doc):
     jig = cirjig(doc)
@@ -18,20 +20,25 @@ def testcirjig(doc):
             btr = tr.opencurrspace()
             tr.addentity(btr, jig.Entity)
 
+
 class cirjig(aced.EntityJig):
     def __new__(cls, *args):
         return aced.EntityJig.__new__(cls, acdb.Circle(acge.Point3d.Origin, acge.Vector3d.ZAxis, 10))
+
     def __init__(self, doc):
         self.center, self.radius = self.Entity.Center, self.Entity.Radius
         self.ed = doc.Editor
+
     def move(self):
         self.it = 0
         res = self.ed.Drag(self)
         return res.Status == aced.PromptStatus.OK
+
     def scale(self):
         self.it = 1
         res = self.ed.Drag(self)
         return res.Status == aced.PromptStatus.OK
+
     def Sampler(self, prompts):
         if self.it == 0:
             opts = aced.JigPromptPointOptions('\n请输入圆心:')
@@ -68,5 +75,6 @@ class cirjig(aced.EntityJig):
             return aced.SamplerStatus.Cancel
         else:
             return aced.SamplerStatus.Cancel
+
     def Update(self):
         self.Entity.Center, self.Entity.Radius = self.center, self.radius
