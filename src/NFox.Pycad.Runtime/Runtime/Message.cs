@@ -1,9 +1,8 @@
-﻿namespace NFox.Pycad.Servers.Tcp
+﻿namespace NFox.Pycad
 {
 
     public enum MessageType
     {
-
 
         Start = 0,
         End = 1,
@@ -11,17 +10,18 @@
 
         DebugStart = 100,
         DebugContinue = 101,
-        DebugSetp = 102,
-        DebugNext = 103,
-        DebugReturn = 104,
-        DebugWait = 105,
+        DebugNext = 102,
+        DebugSetpIn = 103,
+        DebugSetpBack = 104,
+        DebugReturn = 105,
+        DebugWait = 106,
 
         BreakPointAdd = 200,
         BreakPointRemove = 201,
 
         DebugGetGlobals = 300,
         DebugGetLocals = 301,
-        DebugGetClosures = 302,
+        DebugGetFrames = 302,
 
         ConsoleStart = 400,
         ConsoleExec = 401,

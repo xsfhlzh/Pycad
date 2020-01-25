@@ -213,6 +213,9 @@ namespace NFox.Pycad
             json = Directory.CreateSubdirectory(".vscode").GetFileFullName("settings.json");
             if (!System.IO.File.Exists(json))
                 CreateSettingsJson(json);
+            json = Directory.CreateSubdirectory(".vscode").GetFileFullName("launch.json");
+            if (!System.IO.File.Exists(json))
+                CreateLaunchJson(json);
         }
 
         private void CreateFuncsJson(string json)
@@ -268,7 +271,7 @@ namespace NFox.Pycad
                         (
                             new JProperty(
                                 "python.pythonPath", 
-                                "C:\\Program Files\\Python37\\python.exe"),
+                                "C:\\Program Files\\Python37"),
                             new JProperty(
                                 "python.autoComplete.extraPaths",
                                 new JArray(
@@ -283,12 +286,45 @@ namespace NFox.Pycad
                                     "--ignore=E231,E262,E265,E401,E402,E501,E701,E704,E722,F403,F405,F811,W504",
                                     "--verbose")),
                             new JProperty(
-                                "terminal.integrated.shell.windows", 
-                                "powershell.exe"),
-                            new JProperty(
-                                "terminal.integrated.shellArgs.windows", 
-                                new JArray("..\\..\\bin\\pyconsole.exe"))
+                                "terminal.integrated.shell.windows",
+                                "${workspaceFolder}\\..\\..\\bin\\NFox.Pycad.Console.exe")
                         );
+                    root.WriteTo(writer);
+                }
+            }
+        }
+
+        private void CreateLaunchJson(string json)
+        {
+            using (FileStream fs = new FileStream(json, FileMode.Create))
+            {
+                using (StreamWriter sw = new StreamWriter(fs))
+                using (JsonTextWriter writer = new JsonTextWriter(sw))
+                {
+                    writer.Formatting = Formatting.Indented;
+                    JObject root =
+                        new JObject
+                        (
+                            new JProperty(
+                                "version",
+                                "0.2.0"),
+                            new JProperty(
+                                "configurations",
+                                new JArray(
+                                    new JObject(
+                                        new JProperty("name", "Pycad"),
+                                        new JProperty("type", "python"),
+                                        new JProperty("request", "attach"),
+                                        new JProperty("host", "localhost"),
+                                        new JProperty("port", 1219),
+                                        new JProperty("justMyCode", false),
+                                        new JProperty("internalConsoleOptions", "neverOpen"),
+                                        new JProperty(
+                                            "pathMappings",
+                                            new JArray(
+                                                new JObject(
+                                                    new JProperty("localRoot", "${workspaceFolder}"),
+                                                    new JProperty("remoteRoot", "."))))))));
                     root.WriteTo(writer);
                 }
             }
@@ -302,6 +338,8 @@ namespace NFox.Pycad
             CreateFuncsJson(json);
             json = Directory.CreateSubdirectory(".vscode").GetFileFullName("settings.json");
             CreateSettingsJson(json);
+            json = Directory.CreateSubdirectory(".vscode").GetFileFullName("launch.json");
+            CreateLaunchJson(json);
         }
 
         public void LoadCuixs(dynamic menus)

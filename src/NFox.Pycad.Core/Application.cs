@@ -22,40 +22,7 @@ namespace NFox.Pycad.Core
 
         protected override void OnInitializing()
         {
-            LoadSettings();
             Engine.Instance.AddSystemCommand("pyrb", new Action(Start));
-        }
-
-        private void LoadSettings()
-        {
-            //从配置文件中获取系统变量
-            string settings = DirectoryEx.Bin.GetFile("settings.json")?.FullName;
-            using (FileStream fs = new FileStream(settings, FileMode.Open))
-            {
-                using (var sr = new StreamReader(fs))
-                using (JsonTextReader reader = new JsonTextReader(sr))
-                {
-                    foreach (JProperty info in JToken.ReadFrom(reader))
-                        SetVariable(info.Name, ((JValue)info.Value).Value);
-                }
-            }
-        }
-
-        private void SaveSettings()
-        {
-            string settings = DirectoryEx.Bin.GetFile("settings.json")?.FullName;
-            using (FileStream fs = new FileStream(settings, FileMode.Create))
-            {
-                using (var sw = new StreamWriter(fs))
-                using (JsonTextWriter writer = new JsonTextWriter(sw))
-                {
-                    writer.Formatting = Formatting.Indented;
-                    JObject obj = new JObject();
-                    foreach (var info in _settings)
-                        obj.Add(new JProperty(info.Key, info.Value));
-                    obj.WriteTo(writer);
-                }
-            }
         }
 
         protected override void OnLoading()

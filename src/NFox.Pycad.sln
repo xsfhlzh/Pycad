@@ -15,8 +15,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NFox.Pycad.Console", "NFox.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NFox.Pycad.Servers", "NFox.Pycad.Servers\NFox.Pycad.Servers.csproj", "{BCE98515-820C-4AE7-A6FD-5FA16EBAC10B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NFox.DebugTest", "NFox.DebugTest\NFox.DebugTest.csproj", "{50B6D1AA-4004-49BA-B6D8-6420BADE5C46}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NFox.Pycad.Acad", "NFox.Pycad.Acad\NFox.Pycad.Acad.csproj", "{30C82168-E63C-4F52-8675-5685D358083E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NFox.Pycad.Gcad", "NFox.Pycad.Gcad\NFox.Pycad.Gcad.csproj", "{0EC1A41A-8257-432C-988C-8BE77BEA8263}"
@@ -53,10 +51,6 @@ Global
 		{BCE98515-820C-4AE7-A6FD-5FA16EBAC10B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BCE98515-820C-4AE7-A6FD-5FA16EBAC10B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BCE98515-820C-4AE7-A6FD-5FA16EBAC10B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{50B6D1AA-4004-49BA-B6D8-6420BADE5C46}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{50B6D1AA-4004-49BA-B6D8-6420BADE5C46}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{50B6D1AA-4004-49BA-B6D8-6420BADE5C46}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{50B6D1AA-4004-49BA-B6D8-6420BADE5C46}.Release|Any CPU.Build.0 = Release|Any CPU
 		{30C82168-E63C-4F52-8675-5685D358083E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{30C82168-E63C-4F52-8675-5685D358083E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{30C82168-E63C-4F52-8675-5685D358083E}.Release|Any CPU.ActiveCfg = Release|Any CPU

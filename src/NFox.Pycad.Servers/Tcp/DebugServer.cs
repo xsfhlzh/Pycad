@@ -1,180 +1,46 @@
-﻿using IronPython.Runtime;
-using IronPython.Runtime.Exceptions;
+﻿using IronPython.Runtime.Exceptions;
+using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol;
+using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
 using NFox.Pycad.Types;
-using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Net.Sockets;
-using System.Runtime.InteropServices;
-using System.Text;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Threading;
+using vsThread = Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages.Thread;
 
 namespace NFox.Pycad.Servers.Tcp
 {
-    public class DebugServer : LinkBase
+    public class DebugServer : DebugAdapterBase
     {
 
+        private AutoResetEvent _resetEvent = new AutoResetEvent(false);
+
         //单例类
-        public static DebugServer Instance { get; } = new DebugServer();
+        public static DebugServer Instance { get; private set; } 
 
         public bool Enabled { get; private set; }
 
-        private DebugServer()
+        public static void Wait(Socket socket)
         {
-            Status = StatusType.Start;
-            Enabled = false;
-        }
-
-        private Socket _tmpsocket;
-
-        public void LinkTo(Socket socket)
-        {
-            if (_socket != null & Status == StatusType.Wait)
+            using (var stdio = new NetworkStream(socket))
             {
-                //如果连接存在,并处于数据等待
-                lock (_socket)
-                {
-                    //关闭一个等待数据的连接会引发异常
-                    _tmpsocket = socket;
-                    _socket.Close();
-                    _socket = socket;
-                }
-            }
-            else
-            {
-                _socket = socket;
-                Application.GetPlugin("NFox.Pycad.Core").Start();
-                Enabled = true;
+                Instance = new DebugServer();
+                Instance.InitializeProtocolClient(stdio, stdio);
+                Instance.Protocol.Run();
+                Instance.Protocol.WaitForReader();
             }
         }
 
-        
-        protected override bool Response(Message message)
-        {
-            switch (message.Type)
-            {
-                case MessageType.End:
-                    //用户端关闭时抛出异常
-                    throw new Exception("用户退出!");
-                case MessageType.DebugContinue:
-                    Status = StatusType.Continue;
-                    return false;
-                case MessageType.DebugNext:
-                    Status = StatusType.Next;
-                    return false;
-                case MessageType.DebugSetpOut:
-                    Status = StatusType.SetpOut;
-                    return false;
-                case MessageType.DebugSetpIn:
-                    Status = StatusType.SetpIn;
-                    return false;
-                case MessageType.DebugGetGlobals:
-                    Send(MessageType.DebugGetGlobals, $"{Globals.ToJson()}\n");
-                    break;
-                case MessageType.DebugGetLocals:
-                    Send(MessageType.DebugGetLocals, $"{Locals[0].ToJson()}\n");
-                    break;
-                case MessageType.DebugGetClosures:
-                    Send(MessageType.DebugGetClosures, $"{Locals[1].ToJson()}\n");
-                    break;
-                case MessageType.BreakPointAdd:
-                    var obj = JsonConvert.DeserializeObject(message.Content);
-                    if(obj is JArray)
-                    {
-                        foreach (JObject o in (JArray)obj)
-                            AddBreakPoint(o);
-                    }
-                    else
-                    {
-                        AddBreakPoint((JObject)obj);
-                    }
-                    break;
-                case MessageType.BreakPointRemove:
-                    obj = JsonConvert.DeserializeObject(message.Content);
-                    if (obj is JArray)
-                    {
-                        foreach (JObject o in (JArray)obj)
-                            RemoveBreakPoint(o);
-                    }
-                    else
-                    {
-                        RemoveBreakPoint((JObject)obj);
-                    }
-                    break;
-            }
-            return true;
-        }
+        #region Server
 
-        private void AddBreakPoint(JObject obj)
-        {
-            var cbp = new BreakPoint(obj);
-            foreach (var bp in _points)
-            {
-                if (bp.Equals(cbp))
-                    return;
-            }
-            _points.Add(cbp);
-        }
-
-        private void RemoveBreakPoint(JObject obj)
-        {
-            var bp = new BreakPoint(obj);
-            for (int i = 0; i< _points.Count; i++)
-            {
-                if (_points[i].Equals(bp))
-                {
-                    _points.RemoveAt(i);
-                    return;
-                }
-            }
-        }
+        public string ThreadName { get; set; }
 
         public StatusType Status { get; private set; }
 
-        public ValueList Globals;
-        public ValueList[] Locals;
-
-        private List<BreakPoint> _points = new List<BreakPoint>();
+        private Dictionary<string, List<BreakPoint>> _points = new Dictionary<string, List<BreakPoint>> ();
         private BreakPoint _mainpoint;
         private BreakPoint _currpoint;
-
-        [DllImport("user32.dll")]
-        static extern IntPtr SetActiveWindow(IntPtr hWnd);
-
-        [DllImport("user32.dll")]
-        private static extern bool SetForegroundWindow(IntPtr hWnd);
-
-        [DllImport("User32.dll")]
-        public static extern IntPtr FindWindowEx(IntPtr hwndParent, IntPtr hwndChildAfter, string lpClassName, string lpWindowName);
-
-        [DllImport("user32.dll")]
-        private static extern int GetWindowTextW(IntPtr hWnd, [MarshalAs(UnmanagedType.LPWStr)]StringBuilder lpString, int nMaxCount);
-
-        [DllImport("user32.dll")]
-        private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-
-        private void ActiveEditor()
-        {
-            string eclass = Application.GetVariable("editor.class");
-            string ename = Application.GetVariable("editor.name");
-            IntPtr ip = FindWindowEx(IntPtr.Zero, IntPtr.Zero, eclass, null);
-            while (ip != IntPtr.Zero)
-            {
-                StringBuilder sb = new StringBuilder(256);
-                GetWindowTextW(ip, sb, sb.Capacity);
-                string name = sb.ToString();
-                if (name.Contains(ename))
-                {
-                    ShowWindow(ip, 3);
-                    SetActiveWindow(ip);
-                    SetForegroundWindow(ip);
-                    return;
-                }
-                ip = FindWindowEx(IntPtr.Zero, ip, eclass, null);
-            }
-        }
-
-        private static string _prjdir = DirectoryEx.Extensions.FullName.ToLower(); 
 
         public TracebackDelegate Trace(TraceBackFrame frame, string result, object payload)
         {
@@ -186,16 +52,15 @@ namespace NFox.Pycad.Servers.Tcp
                     Status = StatusType.Start;
                     _mainpoint = null;
                 }
-                else if (!bt.FileName.StartsWith("<"))
+                else if (!bt.Path.StartsWith("<"))
                 {
                     switch (Status)
                     {
                         case StatusType.Start:
                             if (_mainpoint == null)
                             {
-                                if (bt.FileName.StartsWith(_prjdir))
+                                if (bt.Path.StartsWith(Workspace))
                                 {
-                                    //ActiveEditor();
                                     _mainpoint = bt;
                                     Wait(frame, result, payload);
                                     break;
@@ -203,18 +68,18 @@ namespace NFox.Pycad.Servers.Tcp
                             }
                             break;
                         case StatusType.Continue:
-                            if (_points.Contains(bt))
+                            if (_points.ContainsKey(bt.Path) && _points[bt.Path].Contains(bt))
                                 Wait(frame, result, payload);
                             break;
                         case StatusType.SetpIn:
                             Wait(frame, result, payload);
                             break;
-                        case StatusType.Next:
-                            if (bt.IsNext(_currpoint))
-                                Wait(frame, result, payload);
-                            break;
                         case StatusType.SetpOut:
                             if (bt.Equals(_currpoint.BackPoint))
+                                Wait(frame, result, payload);
+                            break;
+                        case StatusType.Next:
+                            if (bt.IsNext(_currpoint))
                                 Wait(frame, result, payload);
                             break;
                     }
@@ -223,46 +88,252 @@ namespace NFox.Pycad.Servers.Tcp
             return Trace;
         }
 
+
+
         private void Wait(TraceBackFrame frame, string result, object payload)
         {
+
             _currpoint = new BreakPoint(frame);
-            Globals = ValueList.GetGlobals(frame.f_globals);
-            Locals = ValueList.GetLocals((PythonDictionary)frame.f_locals);
+
+            var pt = _currpoint;
+            _frames = new List<StackFrame>();
+            int i = 1000;
+            while(pt != null)
+            {
+                var path = pt.Path;
+                _frames.Add(
+                    new StackFrame
+                    {
+                        Id = i++,
+                        Name = pt.FunctionName,
+                        Line = pt.Line,
+                        Source = new Source { Name = Path.GetFileName(path), Path = path }
+                    });
+                pt = pt.BackPoint;
+            }
+
+            _values = ValueTree.GetValues(frame);
+
             Status = StatusType.Wait;
-            Wait();
+            Stop(StoppedEvent.ReasonValue.Step);
+            _resetEvent.WaitOne();
+
+            if (Status == StatusType.Stop)
+                throw new System.Exception("调试中断!");
+
         }
 
-        private void Wait()
+        #endregion
+
+        #region Adapter
+
+        private ValueTree _values;
+
+        private List<StackFrame> _frames;
+
+        public string Workspace { get; private set; }
+
+        public void Stop(StoppedEvent.ReasonValue reason)
         {
-            Send(MessageType.DebugWait, _currpoint.ToString());
+            Protocol.SendEvent(new StoppedEvent { Reason = reason, ThreadId = 0 });
+        }
+
+
+        protected override AttachResponse HandleAttachRequest(AttachArguments arguments)
+        {
+            Workspace = ((string)arguments.ConfigurationProperties["workspaceFolder"]).ToLower();
+            return new AttachResponse();
+        }
+
+        protected override InitializeResponse HandleInitializeRequest(InitializeArguments arguments)
+        {
+            Protocol.SendEvent(new InitializedEvent());
+            Protocol.SendEvent(new ThreadEvent(ThreadEvent.ReasonValue.Started, 0));
+            return
+                new InitializeResponse
+                {
+                    SupportsConfigurationDoneRequest = true,
+                    SupportsSetVariable = false,
+                    SupportsDebuggerProperties = false,
+                    SupportsModulesRequest = false,
+                    SupportsSetExpression = false,
+                    SupportsExceptionOptions = false,
+                    SupportsExceptionConditions = false,
+                    SupportsExceptionInfoRequest = false,
+                    SupportsValueFormattingOptions = false,
+                    SupportsEvaluateForHovers = true,
+                    SupportsConditionalBreakpoints = false,
+                    SupportsCompletionsRequest = false,
+                    SupportsDataBreakpoints = false,
+                    SupportsDelayedStackTraceLoading = false,
+                    SupportsDisassembleRequest = false,
+                    SupportsFunctionBreakpoints = false,
+                    SupportsGotoTargetsRequest = false,
+                    SupportsHitConditionalBreakpoints = false,
+                    SupportsLoadedSourcesRequest = false,
+                    SupportsLoadSymbolsRequest = false,
+                    SupportsLogPoints = false,
+                    SupportsModuleSymbolSearchLog = false,
+                    SupportsReadMemoryRequest = false,
+                    SupportsRestartFrame = false,
+                    SupportsRestartRequest = false,
+                    SupportsSetSymbolOptions = false,
+                    SupportsStepBack = false,
+                    SupportsStepInTargetsRequest = false,
+                    SupportsTerminateRequest = false,
+                    SupportsTerminateThreadsRequest = false,
+                    SupportTerminateDebuggee = false
+                };
+        }
+
+        protected override SetBreakpointsResponse HandleSetBreakpointsRequest(SetBreakpointsArguments arguments)
+        {
+            List<Breakpoint> result = new List<Breakpoint>();
+            var path = arguments.Source.Path.ToLower();
+            var pts = _points[path] = new List<BreakPoint>();
+            foreach (var bt in arguments.Breakpoints)
+            {
+                pts.Add(new BreakPoint(path, bt.Line));
+                result.Add(new Breakpoint(true) { Source = arguments.Source, Line = bt.Line });
+            }
+            return new SetBreakpointsResponse(result);
+        }
+
+        protected override ConfigurationDoneResponse HandleConfigurationDoneRequest(ConfigurationDoneArguments arguments)
+        {
+            Enabled = true;
+            Protocol.SendEvent(new ThreadEvent(ThreadEvent.ReasonValue.Started, 0));
+            return new ConfigurationDoneResponse();
+        }
+
+        protected override DisconnectResponse HandleDisconnectRequest(DisconnectArguments arguments)
+        {
+            Enabled = false;
+            Status = StatusType.Stop;
+            _resetEvent.Set();
+            return new DisconnectResponse();
+        }
+
+        protected override ThreadsResponse HandleThreadsRequest(ThreadsArguments arguments)
+        {
+            if (!Enabled)
+                throw new ProtocolException("非命令模式!");
+            return new ThreadsResponse(new List<vsThread> { new vsThread(0, ThreadName) });
+        }
+
+        protected override StackTraceResponse HandleStackTraceRequest(StackTraceArguments arguments)
+        {
+            IEnumerable<StackFrame> enumFrames = _frames;
+            if (arguments.StartFrame.HasValue)
+                enumFrames = enumFrames.Skip(arguments.StartFrame.Value);
+            if (arguments.Levels.HasValue)
+                enumFrames = enumFrames.Take(arguments.Levels.Value);
+            return new StackTraceResponse
+            {
+                StackFrames = enumFrames.ToList(),
+                TotalFrames = _frames.Count
+            };
+        }
+        
+        protected override ScopesResponse HandleScopesRequest(ScopesArguments arguments)
+        {
+            return
+                new ScopesResponse(
+                    _values
+                    .Select(t => new Scope(t.Name, t.Id, true))
+                    .ToList());
+        }
+
+        private List<Variable> GetVariables(int id)
+        {
+            List<Variable> variables = new List<Variable>();
+            foreach(var item in _values.GetTree(id))
+            {
+                variables.Add(
+                    new Variable
+                    {
+                        Name = item.Name,
+                        Value = item.Value.Description,
+                        VariablesReference = item.Id,
+                        Type = item.Value.TypeName
+                    });
+            }
+            return variables;
+        }
+
+        protected override void HandleVariablesRequestAsync(IRequestResponder<VariablesArguments, VariablesResponse> responder)
+        {
+            responder.SetResponse(
+                new VariablesResponse(
+                    GetVariables(responder.Arguments.VariablesReference)));
+        }
+
+        protected override EvaluateResponse HandleEvaluateRequest(EvaluateArguments arguments)
+        {
             try
             {
-                Receive();
-            }
-            catch
-            {
-                if (_tmpsocket == null)
+                var tree = _values.GetTree(arguments.Expression);
+                if (tree == null)
                 {
-                    //用户端关闭时停止服务
-                    Enabled = false;
-                    Status = StatusType.Start;
-                    _socket?.Close();
-                    _socket = null;
-                    _mainpoint = null;
-                    _points = new List<BreakPoint>();
-                    throw new Exception("客户端断开连接!");
+                    try
+                    {
+                        var value = Engine.Instance.Execute(arguments.Expression, ValueTree.Scope);
+                        return new EvaluateResponse(Engine.Instance.GetStr(value), 0);
+                    }
+                    catch
+                    {
+                        return new EvaluateResponse("解析失败!", 0);
+                    }
+                }
+                else if (tree.Value == null)
+                {
+                    return new EvaluateResponse(tree.Name, 0);
                 }
                 else
                 {
-                    //新连接接入,断线重连
-                    _socket.Close();
-                    _socket = _tmpsocket;
-                    _tmpsocket = null;
-                    Wait();
+                    return new EvaluateResponse(tree.Value.Description, tree.Id) { Type = tree.Value.TypeName };
                 }
             }
+            catch
+            {
+                return new EvaluateResponse("解析失败!", 0);
+            }
         }
-       
+
+        protected override ContinueResponse HandleContinueRequest(ContinueArguments arguments)
+        {
+            Status = StatusType.Continue;
+            _resetEvent.Set();
+            return new ContinueResponse();
+        }
+
+        protected override StepInResponse HandleStepInRequest(StepInArguments arguments)
+        {
+            Status = StatusType.SetpIn;
+            _resetEvent.Set();
+            return new StepInResponse();
+        }
+
+        protected override StepOutResponse HandleStepOutRequest(StepOutArguments arguments)
+        {
+            Status = StatusType.SetpOut;
+            _resetEvent.Set();
+            return base.HandleStepOutRequest(arguments);
+        }
+
+        protected override NextResponse HandleNextRequest(NextArguments arguments)
+        {
+            Status = StatusType.Next;
+            _resetEvent.Set();
+            return new NextResponse();
+        }
+
+        protected override SetExceptionBreakpointsResponse HandleSetExceptionBreakpointsRequest(SetExceptionBreakpointsArguments arguments)
+        {
+            return new SetExceptionBreakpointsResponse();
+        }
+
+        #endregion
 
     }
 

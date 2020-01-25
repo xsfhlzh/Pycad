@@ -251,16 +251,18 @@ namespace NFox.Pycad
 
         public string GetStr(dynamic obj)
         {
-            string s = "";
-            if (obj != null)
+            if(obj == null)
+            {
+                return "";
+            }
+            else
             {
                 if (obj is string)
-                    s = $"'{obj}'";
+                    return $"'{obj}'";
                 else
                     using (var value = NewTempValue(obj))
-                        s = Execute($"str({value})");
+                        return Execute($"str({value})");
             }
-            return s;
         }
 
         public void SetTrace(TracebackDelegate func)
@@ -297,7 +299,7 @@ namespace NFox.Pycad
                 {
                     using (var stream = zip.CreateEntry("Version").Open())
                     using (var sw = new StreamWriter(stream))
-                        sw.Write($"{Application.GetVariable("version")}");
+                        sw.Write($"{Utils.GetVariable<string>("version")}");
                     XElement xe = XElement.Load(DirectoryEx.Bin.GetFile("package.xml").FullName);
                     CopyFiles(xe, DirectoryEx.Root, zip);
                     foreach (var e in extensions)

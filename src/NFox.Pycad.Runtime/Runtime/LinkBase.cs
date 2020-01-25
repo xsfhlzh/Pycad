@@ -3,7 +3,7 @@ using System;
 using System.Net.Sockets;
 using System.Text;
 
-namespace NFox.Pycad.Servers.Tcp
+namespace NFox.Pycad
 {
     public abstract class LinkBase
     {
@@ -13,16 +13,32 @@ namespace NFox.Pycad.Servers.Tcp
         protected static int _maxlengthofdata;
         protected byte[] _buffer;
 
+        public event LinkEventHandler BeforeSend;
+        public event EventHandler BeforeReceive;
+        public event LinkEventHandler AfterReceive;
+
+        public class LinkEventArgs : EventArgs
+        {
+
+            public Message Message { get; }
+
+            public LinkEventArgs(MessageType type, string content)
+            {
+                Message = new Message { Type = type, Content = content };
+            }
+
+            public LinkEventArgs(Message message)
+            {
+                Message = message;
+            }
+
+        }
+
+        public delegate void LinkEventHandler(object sender, LinkEventArgs e);
+
         static LinkBase()
         {
-            try
-            {
-                _maxlengthofdata = (int)Application.GetVariable("servers.tcp.maxlengthofdata");
-            }
-            catch
-            {
-                _maxlengthofdata = 1024;
-            }
+            _maxlengthofdata = 1024;
         }
 
         public void Close()
@@ -45,6 +61,9 @@ namespace NFox.Pycad.Servers.Tcp
 
         public void Send(MessageType type, string content = null)
         {
+
+            BeforeSend?.Invoke(this, new LinkEventArgs(type, content));
+
             var bytes = GetBytes(type, content);
             int count = bytes.Length;
 
@@ -83,32 +102,40 @@ namespace NFox.Pycad.Servers.Tcp
 
         public void Receive()
         {
-            _buffer = new byte[_maxlengthofdata];
-            int count = _socket.Receive(_buffer, _maxlengthofdata, SocketFlags.None);
-            var m = GetMessage(_buffer, count);
-            if (m.Type == MessageType.BigData)
+            try
             {
-                var arr = m.Content.Split(';');
-                int n = int.Parse(arr[0]);
-                int total = int.Parse(arr[1]);
 
-                byte[] buffer = new byte[n * _maxlengthofdata];
-                for (int i = 0; i < n; i++)
+                BeforeReceive?.Invoke(this, null);
+
+                _buffer = new byte[_maxlengthofdata];
+                int count = _socket.Receive(_buffer, _maxlengthofdata, SocketFlags.None);
+                var m = GetMessage(_buffer, count);
+                if (m.Type == MessageType.BigData)
                 {
-                    _socket.Receive(_buffer, _maxlengthofdata, SocketFlags.None);
-                    _buffer.CopyTo(buffer, i * _maxlengthofdata);
+                    var arr = m.Content.Split(';');
+                    int n = int.Parse(arr[0]);
+                    int total = int.Parse(arr[1]);
+
+                    byte[] buffer = new byte[n * _maxlengthofdata];
+                    for (int i = 0; i < n; i++)
+                    {
+                        _socket.Receive(_buffer, _maxlengthofdata, SocketFlags.None);
+                        _buffer.CopyTo(buffer, i * _maxlengthofdata);
+                    }
+                    m = GetMessage(buffer, total);
                 }
-                m = GetMessage(buffer, total);
+                if (m.Type == MessageType.End)
+                {
+                    Response(m);
+                    _socket.Close();
+                }
+                else if (Response(m))
+                {
+                    Receive();
+                }
             }
-            if (m.Type == MessageType.End)
-            {
-                Response(m);
-                _socket.Close();
-            }
-            else if (Response(m))
-            {
-                Receive();
-            }
+            catch { }
+
         }
 
         int _num = 0;
@@ -117,11 +144,16 @@ namespace NFox.Pycad.Servers.Tcp
         byte[] _bigbuffer;
 
 
-        protected abstract bool Response(Message message);
+        protected virtual bool Response(Message message)
+        {
+            AfterReceive?.Invoke(this, new LinkEventArgs(message));
+            return false;
+        }
 
 
         public void BegineReceive()
         {
+            BeforeReceive?.Invoke(this, null);
             _buffer = new byte[_maxlengthofdata];
             _socket.BeginReceive(_buffer, 0, _maxlengthofdata, SocketFlags.None, EndReceive, null);
         }

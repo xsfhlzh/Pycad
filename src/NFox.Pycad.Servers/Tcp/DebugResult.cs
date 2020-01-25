@@ -11,6 +11,8 @@ namespace NFox.Pycad.Servers.Tcp
         Next,
         SetpOut,
         Wait,
+        Stop,
+        Close
     }
 
     [DataContract]

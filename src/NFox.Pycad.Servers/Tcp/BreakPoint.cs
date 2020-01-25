@@ -8,55 +8,48 @@ namespace NFox.Pycad.Servers.Tcp
     public class BreakPoint : IEquatable<BreakPoint>
     {
 
-        public string FileName { get; }
+        public string Path { get; }
         public int Line { get; }
+
+        public string FunctionName { get; }
 
         SourceSpan _span;
         TraceBackFrame _backFrame;
 
         public BreakPoint BackPoint
         {
-            get { return new BreakPoint(_backFrame); }
-        }
-
-        public BreakPoint(JObject obj)
-        {
-            FileName = obj.Property("filename").Value.Value<string>().ToLower();
-            Line = obj.Property("line").Value.Value<int>();
+            get
+            {
+                if (_backFrame != null)
+                    return new BreakPoint(_backFrame);
+                return null;
+            }
         }
 
         public BreakPoint(TraceBackFrame frame)
         {
-            FileName = frame.f_code.co_filename.ToLower();
+            FunctionName = frame.f_code.co_name;
+            Path = frame.f_code.co_filename.ToLower();
             Line = (int)frame.f_lineno;
             _span = frame.f_code.Span;
             _backFrame = frame.f_back;
         }
 
-        //public BreakPoint(string filename, int line)
-        //{
-        //    FileName = filename;
-        //    Line = line;
-        //}
-
-        public override string ToString()
+        public BreakPoint(string path, int line)
         {
-            JObject obj =
-                new JObject(
-                    new JProperty("filename", FileName),
-                    new JProperty("line", Line));
-            return obj.ToString();
+            Path = path;
+            Line = line;
         }
 
         public bool Equals(BreakPoint other)
         {
-            return FileName == other.FileName && Line == other.Line;
+            return Path == other.Path && Line == other.Line;
         }
 
         public bool IsNext(BreakPoint pt)
         {
             return
-                FileName == pt.FileName && _span == pt._span && Line != pt.Line ||
+                Path == pt.Path && _span == pt._span && Line != pt.Line ||
                 Equals(pt.BackPoint);
         }
 

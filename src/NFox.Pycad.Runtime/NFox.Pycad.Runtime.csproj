@@ -67,11 +67,14 @@
   <ItemGroup>
     <Compile Include="Runtime\Engine.cs" />
     <Compile Include="Runtime\ExtensionCollection.cs" />
+    <Compile Include="Runtime\LinkBase.cs" />
+    <Compile Include="Runtime\Message.cs" />
     <Compile Include="Runtime\Module.cs" />
     <Compile Include="Runtime\Package.cs" />
     <Compile Include="Runtime\Extension.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Types\ValueList.cs" />
+    <Compile Include="Runtime\Utils.cs" />
+    <Compile Include="Types\ValueTree.cs" />
     <Compile Include="Types\NetValueType.cs" />
     <Compile Include="Types\TypeBase.cs" />
     <Compile Include="Types\ValueBase.cs" />

@@ -107,6 +107,9 @@ namespace NFox.Pycad.Types
 
         }
 
+        
+        public virtual bool HasItems { get { return false; } }
+
         public virtual ValueBase GetItem(string key)
         {
             if (Marshal.IsComObject(Value))
@@ -115,10 +118,9 @@ namespace NFox.Pycad.Types
             catch { return null; }
         }
 
-        public virtual ValueList GetItems()
+        public virtual IEnumerable<ValueTree> GetItems()
         {
             List lst = Engine.Instance.GetValue("clr").Dir(Value);
-            ValueList result = new ValueList();
             if (lst != null)
             {
                 foreach (string key in lst)
@@ -126,10 +128,9 @@ namespace NFox.Pycad.Types
                     dynamic obj = null;
                     try { obj = Engine.Instance.GetValue("getattr")(Value, key); }
                     catch { }
-                    result.Add(ValueBase.GetValue(key, obj));
+                    yield return new ValueTree(ValueBase.GetValue(key, obj));
                 }
             }
-            return result;
         }
 
         public virtual string TypeName { get { return Engine.Instance.GetValue("type")(Value).__name__; } }
@@ -138,11 +139,26 @@ namespace NFox.Pycad.Types
 
     public class Variant : ValueBase
     {
+
+        private static List<string> _basetypes =
+            new List<string>{
+                "int", "float", "bool", "tuple", "list", "dict", "set", "str"
+            };
+
         public Variant(string name, object value) : base(name, value) { }
 
-        public override int ImageIndex { get { return 1; } }
-        public override string Title { get { return $"变量:{Name}"; } }
-        public override string Description { get { return $"类型:{ClrType.FullName}"; } }
+        public override string Description { get { return Engine.Instance.GetStr(Value); } }
+
+        public override bool HasItems
+        {
+            get { return !_basetypes.Contains(TypeName); }
+        }
+
+        public override int Order
+        {
+            get { return 0; }
+        }
+
     }
 
     public class None : Variant
@@ -155,7 +171,17 @@ namespace NFox.Pycad.Types
 
         public None(string name) : base(name, null) { }
 
-        public override string Description { get { return $"None"; } }
+        public override string Description { get { return "None"; } }
+
+        public override bool HasItems
+        {
+            get { return false; }
+        }
+
+        public override int Order
+        {
+            get { return 0; }
+        }
 
     }
 
@@ -184,46 +210,58 @@ namespace NFox.Pycad.Types
             }
         }
 
-        public override int ImageIndex { get { return 3; } }
-        public override string Title
-        {
-            get
-            {
-                string s = "";
-                if (Overloads.Count > 1)
-                    s = $"(+{Overloads.Count - 1}重载)";
-                return $"函数:{Name}{s}";
-            }
-        }
-
         public override string Description
         {
             get
             {
-                if (Overloads.Count > 0)
-                    return Overloads[0].ToString();
-                else
-                    return Value.__doc__;
+                if (Engine.Instance.GetValue("hasattr")(Value, "__name__"))
+                    return $"function {Engine.Instance.GetValue("getattr")(Value, "__name__")}";
+                return $"function {Value.__func__.__name__}";
             }
         }
+
+        public override int Order
+        {
+            get { return 1; }
+        }
+
     }
 
     public class Module : ValueBase
     {
+
         public Module(string name, object value) : base(name, value) { }
 
-        public override int ImageIndex { get { return 4; } }
-        public override string Title { get { return $"模块:{Value.__name__}"; } }
-        public override string Description { get { return Value.__doc__ ?? Value.__file__; } }
+        public override string Description { get { return $"module: {Value.__name__}"; } }
+
+        public override bool HasItems
+        {
+            get { return true; }
+        }
+
+        public override int Order
+        {
+            get { return 2; }
+        }
+
     }
 
     public class Class : ValueBase
     {
         public Class(string name, object value) : base(name, value) { }
 
-        public override int ImageIndex { get { return 5; } }
-        public override string Title { get { return $"经典类:{Value.__name__}"; } }
-        public override string Description { get { return Value.__file__; } }
+        public override string Description { get { return $"class {Value.__name__}"; } }
+
+        public override bool HasItems
+        {
+            get { return true; }
+        }
+
+        public override int Order
+        {
+            get { return 3; }
+        }
+
     }
 
     public class Type : ValueBase
@@ -247,19 +285,24 @@ namespace NFox.Pycad.Types
             }
         }
 
-        public override int ImageIndex { get { return 5; } }
-        public override string Title { get { return $"新式类:{Name}"; } }
         public override string Description
         {
             get
             {
-                if (Engine.Instance.GetValue("hasattr")(Value, "__doc__") && Value.__doc__ != null)
-                    return Value.__doc__;
-                else if(Value.__new__.__doc__ != null)
-                    return Value.__new__.__doc__;
-                return "";
+                return $"type {Value.__name__}";
             }
         }
+
+        public override bool HasItems
+        {
+            get { return true; }
+        }
+
+        public override int Order
+        {
+            get { return 3; }
+        }
+
     }
 
 

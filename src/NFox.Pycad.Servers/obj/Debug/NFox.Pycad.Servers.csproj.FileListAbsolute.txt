@@ -10,6 +10,6 @@ D:\Pycad\Plugins\Servers\settings.xml
 D:\Pycad\Plugins\NFox.Pycad.Servers\settings.xml
 D:\Pycad\Plugins\NFox.Pycad.Servers\NFox.Pycad.Servers.dll
 D:\Pycad\Plugins\NFox.Pycad.Servers\NFox.Pycad.Servers.pdb
-D:\Pycad\Src\NFox.Pycad.Servers\obj\Debug\NFox.Pycad.Servers.dll
-D:\Pycad\Src\NFox.Pycad.Servers\obj\Debug\NFox.Pycad.Servers.pdb
 D:\Pycad\src\NFox.Pycad.Servers\obj\Debug\NFox.Pycad.Servers.csprojResolveAssemblyReference.cache
+D:\Pycad\src\NFox.Pycad.Servers\obj\Debug\NFox.Pycad.Servers.dll
+D:\Pycad\src\NFox.Pycad.Servers\obj\Debug\NFox.Pycad.Servers.pdb

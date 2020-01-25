@@ -26,25 +26,25 @@ namespace NFox.Pycad.Core.Modules
             Engine.Instance.SystemCommands[name]();
         }
 
-        public static void runcmd(string prjname, string name)
+        public static void runcmd(string extname, string name)
         {
             try
             {
-                Application.Curr.SendMessage("BeforeCommand");
-                GetFunc(prjname, name).__call__();
+                Application.Curr.SendMessage("BeforeCommand", name);
+                GetFunc(extname, name).__call__();
             }
             finally
             {
-                Application.Curr.SendMessage("AfterCommand");
+                Application.Curr.SendMessage("AfterCommand", name);
             }
         }
 
-        public static object invokelisp(string prjname, string name, dynamic args)
+        public static object invokelisp(string extname, string name, dynamic args)
         {
             try
             {
-                Application.Curr.SendMessage("BeforeCommand");
-                return GetFunc(prjname, name).__call__(args);
+                Application.Curr.SendMessage("BeforeCommand", name);
+                return GetFunc(extname, name).__call__(args);
             }
             catch
             {
@@ -52,7 +52,7 @@ namespace NFox.Pycad.Core.Modules
             }
             finally
             {
-                Application.Curr.SendMessage("AfterCommand");
+                Application.Curr.SendMessage("AfterCommand", name);
             }
         }
 
@@ -124,7 +124,7 @@ namespace NFox.Pycad.Core.Modules
 
         public static dynamic getvar(string name)
         {
-            return Application.GetVariable(name);
+            return Utils.GetVariable<string>(name);
         }
 
         private static dynamic _tempvalue;
@@ -181,7 +181,7 @@ namespace NFox.Pycad.Core.Modules
 
         public static Version version
         {
-            get { return Application.Version; }
+            get { return Version.Parse(Utils.GetVariable<string>("version")); }
         }
 
         public static void release(string packagename, Extension[] exts)

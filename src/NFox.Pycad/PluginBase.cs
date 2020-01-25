@@ -31,26 +31,6 @@ namespace NFox.Pycad
 
         public dynamic Parent { get; internal set; }
 
-        public static Version Version
-        {
-            get { return new Version(GetVariable("version")); }
-        }
-
-        protected static Dictionary<string, dynamic> _settings = 
-            new Dictionary<string, dynamic>();
-
-        public static dynamic GetVariable(string key)
-        {
-            key = key.ToLower();
-            if(_settings.ContainsKey(key))
-                return _settings[key];
-            return null;
-        }
-
-        public static void SetVariable(string key, dynamic value)
-        {
-            _settings[key.ToLower()] = value;
-        }
 
         public Dictionary<string, PluginBase> Children { get; } 
             = new Dictionary<string, PluginBase>();

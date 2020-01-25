@@ -1,0 +1,20 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Pycad",
+      "type": "python",
+      "request": "attach",
+      "host": "localhost",
+      "port": 1219,
+      "justMyCode": false,
+      "internalConsoleOptions": "neverOpen",
+      "pathMappings": [
+        {
+          "localRoot": "${workspaceFolder}",
+          "remoteRoot": "."
+        }
+      ]
+    }
+  ]
+}

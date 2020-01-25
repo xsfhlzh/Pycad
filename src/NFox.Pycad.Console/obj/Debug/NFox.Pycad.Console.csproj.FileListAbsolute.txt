@@ -11,7 +11,7 @@ D:\Pycad\Lib\pyconsole.exe
 D:\Pycad\Lib\pyconsole.pdb
 D:\Pycad\Plugins\pyconsole.exe
 D:\Pycad\Plugins\pyconsole.pdb
-D:\Pycad\Bin\pyconsole.exe
-D:\Pycad\Bin\pyconsole.pdb
-D:\Pycad\Src\NFox.Pycad.Console\obj\Debug\pyconsole.exe
-D:\Pycad\Src\NFox.Pycad.Console\obj\Debug\pyconsole.pdb
+D:\Pycad\Bin\NFox.Pycad.Console.exe
+D:\Pycad\Bin\NFox.Pycad.Console.pdb
+D:\Pycad\src\NFox.Pycad.Console\obj\Debug\NFox.Pycad.Console.exe
+D:\Pycad\src\NFox.Pycad.Console\obj\Debug\NFox.Pycad.Console.pdb

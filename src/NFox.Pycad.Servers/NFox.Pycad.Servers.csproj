@@ -43,6 +43,10 @@
       <HintPath>..\..\Bin\Microsoft.Scripting.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Microsoft.VisualStudio.Shared.VSCodeDebugProtocol, Version=16.3.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\plugins\NFox.Pycad.Servers\Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\Bin\Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
@@ -52,12 +56,14 @@
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.ServiceModel.Web" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Tcp\BreakPoint.cs" />
@@ -65,12 +71,7 @@
     <Compile Include="Application.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tcp\DebugServer.cs" />
-    <Compile Include="Tcp\Distributor.cs" />
-    <Compile Include="Tcp\LinkBase.cs" />
-    <Compile Include="Tcp\Lister.cs" />
-    <Compile Include="Tcp\Message.cs" />
     <Compile Include="Wcf\ConsoleServer.cs" />
-    <Compile Include="Wcf\DebugServer.cs" />
     <Compile Include="Wcf\ServUtils.cs" />
   </ItemGroup>
   <ItemGroup>
