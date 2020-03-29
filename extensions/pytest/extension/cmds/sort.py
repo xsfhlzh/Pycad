@@ -12,6 +12,7 @@ def pysort(doc):
     from operator import itemgetter
     lst = sorted(pts, key=itemgetter(0, 1))
     #lst = sorted(pts, key = attrgetter("X", "Y"))
+    print(lst)
 
 
 @command()

@@ -1,5 +1,5 @@
 {
     "files.autoGuessEncoding": false,
-    "python.autoComplete.extraPaths": ["..\\stubs\\clrclasses"],
+    "python.autoComplete.extraPaths": ["..\\extensions\\.stubs\\clrclasses"],
     "python.pythonPath": "C:\\Program Files\\Python37"
 }

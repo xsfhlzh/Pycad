@@ -88,8 +88,6 @@ namespace NFox.Pycad.Servers.Tcp
             return Trace;
         }
 
-
-
         private void Wait(TraceBackFrame frame, string result, object payload)
         {
 

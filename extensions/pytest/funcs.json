@@ -44,7 +44,8 @@
       "comtest": "flags=acrx.CommandFlags.UsePickSet",
       "myss1": "",
       "myss2": "",
-      "myss3": ""
+      "myss3": "",
+      "myss4": ""
     },
     ".cmds.sort": {
       "pysort": "",

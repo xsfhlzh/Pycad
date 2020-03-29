@@ -1,6 +1,6 @@
 {
     "python.pythonPath": "C:\\Program Files\\Python37",
-    "python.autoComplete.extraPaths": ["${workspaceFolder}\\..\\.stubs\\pycadsys", "${workspaceFolder}\\..\\.stubs\\clrclasses"],
+    "python.autoComplete.extraPaths": ["..\\.stubs\\pycadsys", "..\\.stubs\\clrclasses"],
     "python.linting.flake8Enabled": true,
     "python.linting.flake8Args": ["--ignore=E231,E262,E265,E401,E402,E501,E701,E704,E722,F403,F405,F811,W504", "--verbose"],
     "terminal.integrated.shell.windows": "${workspaceFolder}\\..\\..\\bin\\NFox.Pycad.Console.exe"

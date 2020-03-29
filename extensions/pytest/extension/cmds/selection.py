@@ -43,3 +43,11 @@ def myss3(doc):
     if ss.cancel(): return
     with dbtrans(doc) as tr:
         print(tr.getobject(ss[0].ObjectId))
+
+
+@command()
+def myss4(doc):
+    ed = doc.Editor  #type:aced.Editor
+    res = ed.GetSelection()
+    for sobj in res.Value:
+        print("%s" % sobj)
