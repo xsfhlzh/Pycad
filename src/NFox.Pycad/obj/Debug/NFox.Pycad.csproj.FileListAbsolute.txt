@@ -6,3 +6,4 @@ D:\Pycad\src\NFox.Pycad\obj\Debug\NFox.Pycad.dll
 D:\Pycad\src\NFox.Pycad\obj\Debug\NFox.Pycad.pdb
 D:\Pycad\NFox.Pycad.dll
 D:\Pycad\NFox.Pycad.pdb
+D:\Pycad\src\NFox.Pycad\obj\Debug\NFox.Pycad.csprojResolveAssemblyReference.cache

@@ -77,6 +77,8 @@ namespace NFox.Pycad.Update
         {
             foreach (var file in DirectoryEx.Update.GetDirectory("extensions").GetFiles())
             {
+                if (file.Name == "placeholder.___")
+                    continue;
                 using (Stream stream = file.OpenRead())
                 {
                     using (ZipArchive zip = new ZipArchive(stream, ZipArchiveMode.Read))
