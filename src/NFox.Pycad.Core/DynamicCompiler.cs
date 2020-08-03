@@ -276,6 +276,7 @@ namespace NFox.Pycad
             ns.Imports.Add(new CodeNamespaceImport("System.IO.Compression"));
             ns.Imports.Add(new CodeNamespaceImport("System.Reflection"));
             ns.Imports.Add(new CodeNamespaceImport("System.Xml.Linq"));
+            ns.Imports.Add(new CodeNamespaceImport("System.Reflection"));
 
             //设置程序集特性
             compunit.AssemblyCustomAttributes.Add(
@@ -425,6 +426,10 @@ namespace NFox.Pycad
                 new CodeSnippetStatement("zip.Dispose();"));
             method.Statements.Add(
                 new CodeSnippetStatement("stream.Dispose();"));
+            method.Statements.Add(
+                new CodeSnippetStatement("stream.Dispose();"));
+            method.Statements.Add(
+                new CodeSnippetStatement("Assembly.LoadFrom(mainpath + \"\\\\NFox.Pycad.Acad.dll\");"));
 
             //函数Terminate
             method =
@@ -455,6 +460,7 @@ namespace NFox.Pycad
                     new CodeConditionStatement(
                         new CodeSnippetExpression("ent.FullName.StartsWith(\"extensions\\\\\")"),
                         new CodeSnippetStatement("Copy(ent, path + \"\\\\update\\\\extensions\\\\\" + ent.Name);"))));
+
 
             //函数Copy
             method =

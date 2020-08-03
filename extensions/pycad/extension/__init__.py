@@ -100,8 +100,8 @@ def pyedit(doc):
 def pyrelease(doc):
     from ctypes import windll
     windll.user32.keybd_event(0x71, 0, 0, 0)
-    exts = pye.extensions
-    print("\n发布项目\n已创建%s个项目:" % exts.Count)
+    exts = [e for e in pye.extensions if e.Name != "pycad"]
+    print("\n发布项目\n已创建%s个项目:" % len(exts))
     i = 0
     for ext in exts:
         i += 1
@@ -111,7 +111,7 @@ def pyrelease(doc):
     opts.UseDefaultValue = True
     opts.DefaultValue = ""
     res = edx.getstr(opts)
-    ids = set(range(1, exts.Count + 1))
+    ids = set(range(1, len(exts) + 1))
     while res.ok():
         if res.value == "":
             sels = ids

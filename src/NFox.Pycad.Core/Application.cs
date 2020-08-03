@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -34,7 +32,7 @@ namespace NFox.Pycad.Core
                 Engine.Instance.Restart();
 
                 //从acad.py中获取初始化信息
-                //Engine.Instance.TryReference("pycad.dll");
+                Engine.Instance.TryReference("pycad.dll");
                 Engine.Instance.Execute($"from pycad.acad import *");
             }
             catch (Exception ex)
@@ -50,8 +48,6 @@ namespace NFox.Pycad.Core
         {
             try
             {
-
-
 
 
                 //获取当前版本Cad的Mgd程序集

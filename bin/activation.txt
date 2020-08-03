@@ -1,0 +1,10 @@
+<activationrequest>
+<version>3</version>
+<machinehash>47FD-47EB-B088-DD59</machinehash>
+<productcode>24</productcode>
+<majorversion>9</majorversion>
+<minorversion>0</minorversion>
+<serialnumber>A3E3-FDDJ-YKZH-E63X-XG44-6B4W</serialnumber>
+<session>ced173c7-161f-4e98-b62d-29c0afcad1ce</session>
+<locale>zh-CN</locale>
+</activationrequest>

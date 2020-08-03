@@ -10,7 +10,7 @@ __all__ = [
     'And', 'And2', 'Or', 'Or2', 'Not', 'Not2', 'Xor', 'Xor2',
     'BuildFilter', 'ToSafeArray', 'ToList', 
     'ToTuple', 'ToBuffer', 'ToFilter',
-    'FromLispData', 'ToLispData']
+    'FromLispData', 'ToLispData', 'ToTypedValue']
 
 from pycad.system.mgdnss import aced as __aced, acdb as __acdb
 import typing as __typing
@@ -56,4 +56,8 @@ def FromLispData(rb: __acdb.ResultBuffer) -> list:
 def ToLispData(obj: __typing.Iterable) -> __acdb.ResultBuffer:
     """
     将迭代器转换为Lisp数据(ResultBuffer)
+    """
+def ToTypedValue(obj) -> __acdb.TypedValue:
+    """
+    将数据转换为Lisp数据(TypedValue)
     """

@@ -23,14 +23,13 @@
   <Directory Name="support">
     <Module Name="pycad" />
   </Directory>
-  <Directory Name="extensions">
-    <Directory Name=".release" />
-    <Directory Name=".scripts" />
-    <Extension Name="pycad" />
+  <Directory Name="update">
+    <Directory Name="extensions" />
   </Directory>
   <Directory Name="main" />
   <Directory Name="temp" />
-  <Directory Name="update">
-    <Directory Name="extensions" />
+  <Directory Name="extensions">
+    <Directory Name=".release" />
+    <Directory Name=".scripts" />
   </Directory>
 </Root>

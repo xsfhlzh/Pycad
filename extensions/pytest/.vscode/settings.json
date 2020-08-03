@@ -1,7 +1,8 @@
 {
     "python.pythonPath": "C:\\Program Files\\Python37",
     "python.autoComplete.extraPaths": ["..\\.stubs\\pycadsys", "..\\.stubs\\clrclasses"],
+    "python.linting.pylintEnabled": false,
     "python.linting.flake8Enabled": true,
-    "python.linting.flake8Args": ["--ignore=E231,E262,E265,E401,E402,E501,E701,E704,E722,F403,F405,F811,W504", "--verbose"],
+    "python.linting.flake8Args": ["--ignore=E231,E262,E265,E302,E303,E401,E402,E501,E701,E704,E722,F403,F405,F811,W391,W504", "--verbose"],
     "terminal.integrated.shell.windows": "${workspaceFolder}\\..\\..\\bin\\NFox.Pycad.Console.exe"
 }

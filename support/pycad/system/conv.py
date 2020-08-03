@@ -2,7 +2,7 @@
     'And', 'And2', 'Or', 'Or2', 'Not', 'Not2', 'Xor', 'Xor2',
     'BuildFilter', 'ToSafeArray', 'ToList', 
     'ToTuple', 'ToBuffer', 'ToFilter',
-    'FromLispData', 'ToLispData']
+    'FromLispData', 'ToLispData', 'ToTypedValue']
 
 And = "&"
 And2 = "and"
@@ -82,38 +82,43 @@ def _getlist(it):
             lst.append(it.Current.Value)
     return lst
 
-def _getbuffer(obj, lst):
+def ToTypedValue(obj):
     from System import Int16, Int32
     if isinstance(obj, acdb.TypedValue):
-        lst.append(obj)
+        return obj
     elif isinstance(obj, (Int16, Int32, int)):
-        lst.append(_newvalue(acrx.LispDataType.Int32, obj))
+        return  _newvalue(acrx.LispDataType.Int32, obj)
     elif obj == True:
-        lst.append(_newvalue(acrx.LispDataType.T_atom))
+        return _newvalue(acrx.LispDataType.T_atom)
     elif obj in (False, None):
-        lst.append(_newvalue(acrx.LispDataType.Nil))
+        return _newvalue(acrx.LispDataType.Nil)
     elif isinstance(obj, float):
-        lst.append(_newvalue(acrx.LispDataType.Double, obj))
+        return _newvalue(acrx.LispDataType.Double, obj)
     elif isinstance(obj, str):
-        lst.append(_newvalue(acrx.LispDataType.Text, obj))
+        return _newvalue(acrx.LispDataType.Text, obj)
     elif isinstance(obj, acge.Point2d):
-        lst.append(_newvalue(acrx.LispDataType.Point2d, obj))
+        return _newvalue(acrx.LispDataType.Point2d, obj)
     elif isinstance(obj, acge.Point3d):
-        lst.append(_newvalue(acrx.LispDataType.Point3d, obj))
+        return _newvalue(acrx.LispDataType.Point3d, obj)
     elif isinstance(obj, acdb.ObjectId):
-        lst.append(_newvalue(acrx.LispDataType.ObjectId, obj))
+        return _newvalue(acrx.LispDataType.ObjectId, obj)
     elif isinstance(obj, aced.SelectionSet):
-        lst.append(_newvalue(acrx.LispDataType.SelectionSet, obj))
-    else:
-        from collections import Iterable
-        if isinstance(obj, Iterable):
-            lst.append(_newvalue(acrx.LispDataType.ListBegin))
-            for o in obj:
-                _getbuffer(o, lst)
-            if isinstance(obj, tuple):
-                lst.append(_newvalue(acrx.LispDataType.DottedPair))
-            else:
-                lst.append(_newvalue(acrx.LispDataType.ListEnd))
+        return _newvalue(acrx.LispDataType.SelectionSet, obj)
+
+def _getbuffer(obj, lst):
+    from collections import Iterable
+    tv = ToTypedValue(obj)
+    if tv:
+        lst.append(tv)
+    elif isinstance(obj, Iterable):
+        lst.append(_newvalue(acrx.LispDataType.ListBegin))
+        for o in obj:
+            _getbuffer(o, lst)
+        if isinstance(obj, tuple):
+            lst.append(_newvalue(acrx.LispDataType.DottedPair))
+        else:
+            lst.append(_newvalue(acrx.LispDataType.ListEnd))
+       
 
 def _newvalue(code, value = -1):
     try:

@@ -46,3 +46,9 @@ def layertest(doc):
     with dbtrans(doc) as tr:
         #新建图层
         tr.addlayer('1')
+
+
+@command()
+def clayertest(doc):
+    with dbtrans(doc) as tr:
+        acapp.DocumentManager.MdiActiveDocument.Database.Clayer = tr.LayerTable["1"]

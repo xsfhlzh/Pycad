@@ -228,3 +228,95 @@ class serializable(object):
     @staticmethod
     def Bool(fget):
         return serializable.property(bool)(fget)
+
+
+class invokeArx(object):
+
+    _dlls = []
+    _funcs = {}
+    from ctypes import cdll as _cdll
+
+    @classmethod
+    def load(cls, name):
+        name = name.lower()
+        if not cls._dlls.__contains__(name):
+            cls._dlls.append(name)
+            cls._cdll.LoadLibrary(name)
+        return cls._cdll[name]
+
+    @classmethod
+    def lib(cls, name):
+        return cls._arxfuncbody(name)
+
+    @classmethod
+    def apply32(cls, entry, ver=-1):
+        func = cls._arxfuncbody()
+        func.apply32(entry, ver)
+        return func
+
+    @classmethod
+    def apply64(cls, entry, ver=-1):
+        func = cls._arxfuncbody()
+        func.apply64(entry, ver)
+        return func
+
+    class _arxfuncbody(object):
+
+        def __init__(self, name=None):
+            self.dll = name
+            self.dict32, self.dict64 = {}, {}
+
+        def apply32(self, entry, ver):
+            self.dict32[ver] = entry
+
+        def apply64(self, entry, ver):
+            self.dict64[ver] = entry
+
+        def __call__(self, body):
+            self.__name__ = body.__name__
+            if isinstance(body, invokeArx._arxfuncbody):
+                self.dict32.update(body.dict32)
+                self.dict64.update(body.dict64)
+                entry = None
+            else:
+                entry = self.__name__
+            if self.dll:
+                if not entry:
+                    curr_version = float('%s.%s' % (acapp.Version.Major, acapp.Version.Minor))
+                    from platform import architecture
+                    d = self.dict64 if architecture()[0] == "64bit" else self.dict32
+                    for key in sorted(d):
+                        if curr_version >= key: ver = key
+                        else: break
+                    if ver:
+                        entry = d[ver]
+                if entry:
+                    if self.dll == "acad":
+                        dll = invokeArx.load("acad.exe")
+                    elif self.dll == "accore":
+                        dll = invokeArx.load("accore.dll")
+                        if not dll:
+                            dll = invokeArx.load("acad.exe")
+                    elif self.dll == "acdb@":
+                        dll = invokeArx.load("acdb%s.dll" % acapp.Version.Major)
+                    else:
+                        dll = invokeArx.load(self.dll)
+                    return dll[entry]
+            else:
+                return self
+
+    _lispfuncs = []
+
+    @classmethod
+    def lisp(cls, *args):
+        accore = cls.load("accore.dll")
+        if not cls._lispfuncs.__contains__(args[0]):
+            cls._lispfuncs.append(args[0])
+            accore.ads_queueexpr("(vl-acad-defun '%s)\n" % args[0])
+        d = acdb.ResultBuffer(tuple(conv.ToTypedValue(x) for x in args))
+        from ctypes import c_long, byref
+        ip = c_long()
+        res = accore.acedInvoke(d.UnmanagedObject, byref(ip))
+        if res != -5001:
+            from System import IntPtr
+            return acdb.ResultBuffer.Create(IntPtr(ip.value), True)

@@ -20,6 +20,8 @@ Editor/Debuger
 
 7、调试器基本完成,提供测试，调试流程: 打开Cad->打开pytest项目->按下F5->在Cad中敲命令即可进入调试模式；退出调试只需要点vscode中的断开连接按钮。
 
+8、修正发布功能，增加invokeArx模块以调用Arx函数，例子见pytest项目的runtime模块
+
 感谢山人编写的文档，但是改版暂时只能借鉴了，我们一起把他顶出来写新版的吧：）
 
 如果pye命令出现“系统找不到指定的文件”的错误，请在“Pycad\bin”目录下找到配置文件settings.json，修改“editor.path”参数为vscode的安装目录

@@ -38,7 +38,9 @@
       "cmdtest": "",
       "dbxtest": "",
       "showpickfirstinfo": "",
-      "unshowpickfirstinfo": ""
+      "unshowpickfirstinfo": "",
+      "runarx": "",
+      "runlisp": ""
     },
     ".cmds.selection": {
       "comtest": "flags=acrx.CommandFlags.UsePickSet",
@@ -55,7 +57,8 @@
       "dicttest": "",
       "dicttest2": "",
       "dicttest3": "",
-      "layertest": ""
+      "layertest": "",
+      "clayertest": ""
     },
     ".cmds.xdata": {
       "myxdata": "",

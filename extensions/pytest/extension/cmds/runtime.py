@@ -106,3 +106,39 @@ def unshowpickfirstinfo(doc):
     docs.DocumentCreated -= doc_created
     for d in docs:
         d.ImpliedSelectionChanged -= pickfirst_changed
+
+
+@invokeArx.lib("acdb@")
+@invokeArx.apply32("?acdbGetAdsName@@YA?AW4ErrorStatus@Acad@@AAY01JVAcDbObjectId@@@Z")
+@invokeArx.apply64("?acdbGetAdsName@@YA?AW4ErrorStatus@Acad@@AEAY01_JVAcDbObjectId@@@Z")
+def acdbGetAdsName(*args):
+    pass
+
+@invokeArx.lib("accore")
+def acdbEntGetX(*arg):
+    pass
+
+
+from ctypes import Structure, c_longlong, byref
+class adsname(Structure):
+    _fields_ = [
+        ("name1", c_longlong),
+        ("name2", c_longlong)]
+
+
+@command()
+def runarx(doc):
+    res = edx.entsel("请选择图元")
+    if not res.ok(): return
+    name = adsname()
+    acdbGetAdsName(byref(name), res.ObjectId)
+    rb = acdb.ResultBuffer((acdb.TypedValue(int(acrx.LispDataType.Text), "*"),))
+    ip = acdbEntGetX(name, rb.UnmanagedObject)
+    from System import IntPtr
+    rb = acdb.ResultBuffer.Create(IntPtr(ip), True)
+    print(rb)
+
+
+@command()
+def runlisp(doc):
+    print(invokeArx.lisp("+", 1, 2))
