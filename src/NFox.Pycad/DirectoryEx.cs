@@ -48,23 +48,27 @@ namespace NFox.Pycad
         {
             get
             {
-                if (_root == null)
-                    Init();
                 return _root;
             }
         }
 
-        public static DirectoryInfo Bin { get; } = Root.GetDirectory("bin");
+        public static DirectoryInfo Bin { get { return Root.GetDirectory("bin"); } }
 
-        public static DirectoryInfo Plugins { get; } = Root.GetDirectory("plugins");
-        public static DirectoryInfo Support { get; } = Root.GetDirectory("support");
-        public static DirectoryInfo Extensions { get; } = Root.GetDirectory("extensions");
+        public static DirectoryInfo Plugins { get { return Main.GetDirectory("plugins"); } }
 
-        public static DirectoryInfo Stubs { get; } = Extensions.GetDirectory(".stubs");
+        public static DirectoryInfo MainBackupPlugins { get { return MainBackup.GetDirectory("plugins"); } }
 
-        public static FileInfo PythonLib { get; } = Bin.GetFile("Lib.zip");
-        public static DirectoryInfo Temp { get; } = Root.GetDirectory("temp");
-        public static DirectoryInfo Update { get; } = Root.GetDirectory("update");
+        public static DirectoryInfo Support { get { return Root.GetDirectory("support"); } }
+
+        public static DirectoryInfo Extensions { get { return Root.GetDirectory("extensions"); } }
+
+        public static DirectoryInfo Stubs { get { return Extensions.GetDirectory(".stubs"); } }
+
+        public static FileInfo PythonLib { get { return Bin.GetFile("Lib.zip"); } }
+
+        public static DirectoryInfo Temp { get { return Root.GetDirectory("temp"); } }
+
+        public static DirectoryInfo Update { get { return Root.GetDirectory("update"); } }
 
         public static DirectoryInfo GetDirectory(Assembly assem)
         {

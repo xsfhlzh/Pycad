@@ -127,7 +127,10 @@ def pyrelease(doc):
     import System
     opts = aced.PromptStringOptions("\n请输入安装包名称")
     opts.UseDefaultValue = True
-    opts.DefaultValue = System.Environment.MachineName
+    if len(sels) == 1:
+        opts.DefaultValue = exts[list(sels)[0] - 1].Name
+    else:
+        opts.DefaultValue = System.Environment.MachineName
     res = edx.getstr(opts)
     if res.ok():
         pye.release(res.value, tuple(exts[i - 1] for i in sels))

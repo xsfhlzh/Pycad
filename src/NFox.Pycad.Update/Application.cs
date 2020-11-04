@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.IO.Compression;
 using System.Xml.Linq;
 
@@ -10,50 +11,101 @@ namespace NFox.Pycad.Update
         protected override void OnInitializing()
         {
 
+            //保证下次从主目录启动
+            VersionBase.RegApp();
+
+
+
+            //更新其他的文件
             var file = DirectoryEx.Update.GetFile("package.xml");
             if (file != null)
             {
                 XElement xe = XElement.Load(file.FullName);
-                UpdateFiles(xe, DirectoryEx.Root);
+                UpdateFiles(xe, DirectoryEx.Root, true);
             }
             UnzipExts();
+
         }
 
-        private void UpdateFiles(XElement xe, DirectoryInfo dir)
+        protected override void OnTerminated()
         {
-            foreach(var e in xe.Elements())
+            
+            if(!DirectoryEx.StartFromMain)
+            {
+                DelFiles(DirectoryEx.Main);
+                foreach (var sdir in DirectoryEx.MainBackupPlugins.GetDirectories())
+                    sdir.Delete();
+            }
+
+            var file = DirectoryEx.Update.GetFile("package.xml");
+            if (file != null)
+            {
+                //更新主文件至备份目录
+                XElement xe = XElement.Load(file.FullName);
+                UpdateFiles(xe, DirectoryEx.Root, false);
+                DirectoryEx.Update.GetFile("Version")?.Delete();
+            }
+        }
+
+        private void DelFiles(DirectoryInfo dir)
+        {
+            foreach (var file in dir.GetFiles())
+                file.Delete();
+            foreach (var sdir in dir.GetDirectories())
+                DelFiles(sdir);
+        }
+
+        private void CopyTo(DirectoryInfo source, DirectoryInfo target)
+        {
+            foreach (var file in source.GetFiles())
+                file.CopyTo(target.GetFileFullName(file.Name));
+            foreach (var dir in source.GetDirectories())
+                CopyTo(dir, target.CreateSubdirectory(dir.Name));
+        }
+
+        private void UpdateFiles(XElement xe, DirectoryInfo dir, bool atStart)
+        {
+            foreach (var e in xe.Elements())
             {
                 string name = e.Attribute("Name").Value;
                 FileInfo file;
-                switch(e.Name.LocalName)
+                switch (e.Name.LocalName)
                 {
                     case "Directory":
-                        UpdateFiles(e, dir.CreateSubdirectory(name));
+                        UpdateFiles(e, dir.CreateSubdirectory(name), atStart);
+                        break;
+                    case "Module":
+                        if (atStart)
+                        {
+                            var dllname = name + ".dll";
+                            file = DirectoryEx.Update.GetFile(dllname);
+                            file.CopyTo($"{dir.FullName}\\{dllname}", true);
+                            file.Delete();
+                        }
                         break;
                     case "Plugin":
                         file = DirectoryEx.Update.GetFile(name);
                         using (var source = File.OpenRead(file.FullName))
-                            Unzip(source, dir.GetDirectory(name));
-                        file.Delete();
-                        break;
-                    case "Module":
-                        var dllname = name + ".dll";
-                        file = DirectoryEx.Update.GetFile(dllname);
-                        file.CopyTo($"{dir.FullName}\\{dllname}");
+                            Unzip(source, DirectoryEx.MainBackupPlugins.CreateSubdirectory(name));
                         file.Delete();
                         break;
                     case "File":
-                        if (dir != DirectoryEx.Root)
+                        if (dir == DirectoryEx.Root)
                         {
                             file = DirectoryEx.Update.GetFile(name);
-                            file.CopyTo($"{dir.FullName}\\{name}");
+                            file.CopyTo(DirectoryEx.MainBackup.GetFileFullName(name), true);
+                            file.Delete();
+                        }
+                        else if (atStart)
+                        {
+                            file = DirectoryEx.Update.GetFile(name);
+                            file.CopyTo($"{dir.FullName}\\{name}", true);
                             file.Delete();
                         }
                         break;
                 }
             }
         }
-
 
         private void Unzip(Stream stream, DirectoryInfo dir)
         {

@@ -36,3 +36,5 @@ class UCWpfTestForm(UserControl):
         self.InputTb.Text += sender.Content
         from pycad.runtime import utils
         utils.setvalue('WpfTestForm', self.InputTb.Text)
+
+

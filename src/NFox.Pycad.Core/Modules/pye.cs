@@ -2,6 +2,9 @@
 using System.IO;
 using System.Reflection;
 using Microsoft.Win32;
+using System.IO.Compression;
+using System.Linq;
+using Mono.Cecil;
 
 namespace NFox.Pycad.Core.Modules
 {
@@ -88,24 +91,37 @@ namespace NFox.Pycad.Core.Modules
         {
             var ext = extensions[name];
             if (ext != null)
-            {
-                ext.CheckInfo();
                 open(extensions[name].Path);
-            }
         }
 
         public static void create_extension(string name)
         {
             var dir = DirectoryEx.Extensions.CreateSubdirectory(name);
-            var extdir = dir.CreateSubdirectory("extension");
-            var file = File.Create(extdir.GetFileFullName("__init__.py"));
-            file.Close();
-            dir.CreateSubdirectory("data");
-            dir.CreateSubdirectory("cuix");
+            var zipfile = DirectoryEx.Extensions.GetDirectory(".stubs").GetFileFullName("template.zip");
+            using (FileStream fs = new FileStream(zipfile, FileMode.Open))
+            using (ZipArchive zip = new ZipArchive(fs, ZipArchiveMode.Read))
+            {
+                var ents = zip.Entries.OrderBy(e => e.FullName);
+                foreach (var ent in zip.Entries.OrderBy(e => e.FullName))
+                {
+                    var fullname = ent.FullName;
+                    if (fullname.EndsWith("/"))
+                    {
+                        dir.CreateSubdirectory(fullname);
+                    }
+                    else
+                    {
+                        using (var source = ent.Open())
+                        using (var target = File.Create(dir.GetFileFullName(fullname)))
+                        {
+                            source.CopyTo(target);
+                        }
+                    }
+                }
+            }
             var ext = new Extension(dir);
             ext.Init(false);
             Engine.Extensions.Add(ext);
-            ext.CreateInfo();
             open_extension(name);
         }
 
@@ -186,12 +202,22 @@ namespace NFox.Pycad.Core.Modules
 
         public static void release(string packagename, Extension[] exts)
         {
-            Engine.Instance.Release(exts);
+
             string name = packagename;
             int i = 2;
-            while(DirectoryEx.Temp.GetFile(name + ".Setup.dll") != null)
-                name = packagename + i++;
-            DynamicCompiler.BuildReleaseAssembly($"{DirectoryEx.Temp.FullName}\\{name}.Setup.dll");
+            while (DirectoryEx.Temp.GetFile($"{name}.Setup.exe") != null)
+                name = $"{packagename}{i++}";
+            name = $"{name}.Setup.exe";
+
+            //修改安装程序,将包含主程序文件和插件的压缩流写入最终安装程序的资源
+            var definition = AssemblyDefinition.ReadAssembly(DirectoryEx.Bin.GetFileFullName("NFox.Pycad.Setup.exe"));
+            using (var rstream = Engine.Instance.GetReleaseStream(exts))
+            {
+                var er = new EmbeddedResource("Release", ManifestResourceAttributes.Public, rstream);
+                definition.MainModule.Resources.Add(er);
+                definition.Write(DirectoryEx.Temp.GetFileFullName(name));
+            }
+
         }
 
         public static void build_extension(string name)

@@ -249,14 +249,21 @@ class invokeArx(object):
         return cls._arxfuncbody(name)
 
     @classmethod
-    def apply32(cls, entry, ver=-1):
+    def pointer32(cls, entry, ver=-1):
         func = cls._arxfuncbody()
         func.apply32(entry, ver)
         return func
 
     @classmethod
-    def apply64(cls, entry, ver=-1):
+    def pointer64(cls, entry, ver=-1):
         func = cls._arxfuncbody()
+        func.apply64(entry, ver)
+        return func
+
+    @classmethod
+    def pointer(cls, entry, ver=-1):
+        func = cls._arxfuncbody()
+        func.apply32(entry, ver)
         func.apply64(entry, ver)
         return func
 
@@ -312,7 +319,7 @@ class invokeArx(object):
         accore = cls.load("accore.dll")
         if not cls._lispfuncs.__contains__(args[0]):
             cls._lispfuncs.append(args[0])
-            accore.ads_queueexpr("(vl-acad-defun '%s)\n" % args[0])
+            accore.ads_queueexpr('(vl-acad-defun "%s")\n' % args[0])
         d = acdb.ResultBuffer(tuple(conv.ToTypedValue(x) for x in args))
         from ctypes import c_long, byref
         ip = c_long()

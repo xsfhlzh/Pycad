@@ -28,7 +28,9 @@ namespace NFox.Pycad
         {
 
             if (root == null)
+            {
                 root = DirectoryEx.Root;
+            }
 
             //注册所有AutoCad版本
             foreach (var ver in AcadVersion.Versions)

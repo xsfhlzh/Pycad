@@ -1,6 +1,0 @@
-D:\NFox\Src\NFox.Dynamic\obj\Debug\NFox.Dynamic.dll
-D:\NFox\Src\NFox.Dynamic\obj\Debug\NFox.Dynamic.pdb
-D:\NFox\NFox.Dynamic.dll
-D:\NFox\NFox.Dynamic.pdb
-D:\NFox\Lib\NFox.Dynamic.dll
-D:\NFox\Lib\NFox.Dynamic.pdb

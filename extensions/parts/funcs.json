@@ -1,0 +1,13 @@
+{
+  "commands": {
+    ".cmds": {
+      "InsertPart": "'Tls:InsertPart', acrx.CommandFlags.Redraw"
+    }
+  },
+  "lisps": {},
+  "panels": {
+    ".cmds": {
+      "ShowPartListView": "'Tls:ShowPartListView'"
+    }
+  }
+}

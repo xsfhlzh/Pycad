@@ -26,7 +26,8 @@
     },
     ".cmds.jig": {
       "testblockjig": "",
-      "testcirjig": ""
+      "testcirjig": "",
+      "xhqtest": ""
     },
     ".cmds.linq": {
       "linqtest": "flags=acrx.CommandFlags.UsePickSet",
@@ -40,7 +41,8 @@
       "showpickfirstinfo": "",
       "unshowpickfirstinfo": "",
       "runarx": "",
-      "runlisp": ""
+      "runlisp": "flags=acrx.CommandFlags.Session",
+      "zoomtest": ""
     },
     ".cmds.selection": {
       "comtest": "flags=acrx.CommandFlags.UsePickSet",

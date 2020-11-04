@@ -109,14 +109,14 @@ def unshowpickfirstinfo(doc):
 
 
 @invokeArx.lib("acdb@")
-@invokeArx.apply32("?acdbGetAdsName@@YA?AW4ErrorStatus@Acad@@AAY01JVAcDbObjectId@@@Z")
-@invokeArx.apply64("?acdbGetAdsName@@YA?AW4ErrorStatus@Acad@@AEAY01_JVAcDbObjectId@@@Z")
-def acdbGetAdsName(*args):
-    pass
+@invokeArx.pointer32("?acdbGetAdsName@@YA?AW4ErrorStatus@Acad@@AAY01JVAcDbObjectId@@@Z")
+@invokeArx.pointer64("?acdbGetAdsName@@YA?AW4ErrorStatus@Acad@@AEAY01_JVAcDbObjectId@@@Z")
+def GetAdsName(*args): pass
+
 
 @invokeArx.lib("accore")
-def acdbEntGetX(*arg):
-    pass
+@invokeArx.pointer("acdbEntGetX")
+def EntGetX(*arg): pass
 
 
 from ctypes import Structure, c_longlong, byref
@@ -131,14 +131,19 @@ def runarx(doc):
     res = edx.entsel("请选择图元")
     if not res.ok(): return
     name = adsname()
-    acdbGetAdsName(byref(name), res.ObjectId)
+    GetAdsName(byref(name), res.ObjectId)
     rb = acdb.ResultBuffer((acdb.TypedValue(int(acrx.LispDataType.Text), "*"),))
-    ip = acdbEntGetX(name, rb.UnmanagedObject)
+    ip = EntGetX(name, rb.UnmanagedObject)
     from System import IntPtr
     rb = acdb.ResultBuffer.Create(IntPtr(ip), True)
     print(rb)
 
 
-@command()
+@command(flags=acrx.CommandFlags.Session)
 def runlisp(doc):
     print(invokeArx.lisp("+", 1, 2))
+
+
+@command()
+def zoomtest(doc):
+    acapp.AcadApplication.ZoomExtents()

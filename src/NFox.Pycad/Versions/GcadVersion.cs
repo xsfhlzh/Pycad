@@ -9,19 +9,16 @@ namespace NFox.Pycad
 
         private GcadVersion(string rootkey)
         {
-            ProductRootKey = rootkey;
-            var rk =
-                Registry
-                .CurrentUser
-                .OpenSubKey($@"SOFTWARE\Gstarsoft\GstarCAD\{ProductRootKey}\zh-CN");
-            ProductName = rk.GetValue("ProductName").ToString();
-            var arr = rk.GetValue("Version").ToString().Split('.');
-            Major = int.Parse(arr[0]);
-            Minor = int.Parse(arr[1]);
-            var gs2 = Regex.Match(ProductName, "浩辰CAD (\\d+)");
-            if (gs2.Success) Number = int.Parse(gs2.Groups[1].Value);
-            Location = rk.GetValue("LOCATION").ToString();
-            rk.Close();
+            ProductRootKey = $@"SOFTWARE\Gstarsoft\GstarCAD\{rootkey}\zh-CN";
+            using (var rk = Registry.CurrentUser.OpenSubKey(ProductRootKey))
+            {
+                ProductName = rk.GetValue("ProductName").ToString();
+                var arr = rk.GetValue("Version").ToString().Split('.');
+                Major = int.Parse(arr[0]);
+                Minor = int.Parse(arr[1]);
+                var gs2 = Regex.Match(ProductName, "浩辰CAD (\\d+)");
+                if (gs2.Success) Number = int.Parse(gs2.Groups[1].Value);
+            }
         }
 
         private static List<VersionBase> _versions;
@@ -54,33 +51,18 @@ namespace NFox.Pycad
         public override void RegApp(string name, string location, string desc)
         {
             var info = new AssemInfo(name, location, desc);
-
+            //注册预加载程序集
             try
             {
-                var rootkey =
-                Registry
-                .CurrentUser
-                .OpenSubKey($@"SOFTWARE\Gstarsoft\GstarCAD\{ProductRootKey}\zh-CN", true);
-                RegistryKey appskey = rootkey.CreateSubKey("Applications");
-
-                //注册预加载程序集
-                RegistryKey rk = appskey.OpenSubKey(info.Name, true);
-                if (rk == null)
+                using (var rootkey = Registry.CurrentUser.OpenSubKey(ProductRootKey, true))
+                using (var appskey = rootkey.CreateSubKey("Applications"))
+                using (var rk = appskey.CreateSubKey(info.Name))
                 {
-                    rk = appskey.CreateSubKey(info.Name);
                     rk.SetValue("DESCRIPTION", info.Description, RegistryValueKind.String);
                     rk.SetValue("LOADER", info.Location, RegistryValueKind.String);
                     rk.SetValue("LOADCTRLS", info.LoadType, RegistryValueKind.DWord);
                     rk.SetValue("MANAGED", 1, RegistryValueKind.DWord);
                 }
-                else if (rk.GetValue("LOADER").ToString() != info.Location)
-                {
-                    rk.SetValue("LOADER", info.Location, RegistryValueKind.String);
-                }
-
-                rk.Close();
-                appskey.Close();
-                rootkey.Close();
             }
             catch { }
         }

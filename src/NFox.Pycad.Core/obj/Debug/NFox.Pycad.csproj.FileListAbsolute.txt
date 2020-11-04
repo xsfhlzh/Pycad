@@ -1,9 +1,0 @@
-D:\NFox\Src\NFox.Pyloader\obj\Debug\NFox.Pycad.csprojResolveAssemblyReference.cache
-D:\NFoxLite\NFox.Pycad.dll
-D:\NFoxLite\NFox.Pycad.pdb
-D:\NFox\Src\NFox.Pyloader\obj\Debug\NFox.Pycad.dll
-D:\NFox\Src\NFox.Pyloader\obj\Debug\NFox.Pycad.pdb
-D:\NFox\NFox.Pycad.dll
-D:\NFox\NFox.Pycad.pdb
-D:\NFox\Lib\NFox.Pycad.dll
-D:\NFox\Lib\NFox.Pycad.pdb

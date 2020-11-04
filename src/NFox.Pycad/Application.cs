@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -20,9 +21,7 @@ namespace NFox.Pycad
 
         protected override void OnInitializing()
         {
-
-            //保证下次从主目录启动
-            VersionBase.RegApp();
+            DirectoryEx.Init();
 
             var domain = AppDomain.CurrentDomain;
             domain.AssemblyResolve += assemblyResolve;
@@ -41,7 +40,7 @@ namespace NFox.Pycad
                     DirectoryEx.Support.FullName,
                 };
 
-            var infos = 
+            var infos =
                 DirectoryEx
                 .Plugins
                 .GetDirectories()
@@ -50,29 +49,6 @@ namespace NFox.Pycad
 
             StartPluginTree(infos.Where(p => p.Preload), true);
             StartPluginTree(infos.Where(p => !p.Preload));
-
-        }
-
-        protected override void OnTerminated()
-        {
-            //如果有文件更新, 下一次从备份目录启动
-            var file = DirectoryEx.Update.GetFile("package.xml");
-            if (file != null)
-            {
-                if (!DirectoryEx.StartFromMain)
-                    VersionBase.RegApp(DirectoryEx.MainBackup);
-                XElement xe = XElement.Load(file.FullName);
-                foreach (var e in xe.Elements())
-                {
-                    if (e.Name == "File")
-                    {
-                        string name = e.Attribute("Name").Value;
-                        var mainfile = DirectoryEx.Update.GetFile(name);
-                        mainfile.CopyTo(DirectoryEx.MainBackup.GetFileFullName(name));
-                        mainfile.Delete();
-                    }
-                }
-            }
         }
 
         private static List<string> _searchpaths;

@@ -1,0 +1,79 @@
+2018/8/19
+升级版本0.6.278.0
+添加发布功能，可将单个py项目打包成自解压的安装程序（默认生成到Temp目录下）
+在Pycad编辑器的项目管理器中找到要打包的项目，点击右键发布
+2018/9/6
+升级版本0.8.278.0
+添加conv.BuildFilter()函数,快速生成选择集过滤器
+顶层包的命令加载模式改为在commands子包中自动加载
+顶层包的初始化模式为在loading子包自动加载cuix和面板和lisp函数定义
+增加调试功能(测试)
+2019/4/18
+升级版本0.9.278.0
+顶层包的命令加载模式改为在顶层包的__init__.py中设置
+loads = ["lisps", "panels"] //预先加载模块
+commands = ["commands"] //命令模块
+unloads = [] //卸载模块
+并在命令模块写好import
+from . import entities, forms, jigs, selections, sorts, tables
+pye命令改为打开vscode编辑
+智能提示做了一部分
+添加vscode中使用的控制台程序
+2019/5/17
+升级版本0.9.279.0
+对应IronPython版本升级为2.79
+添加调试器测试程序(为后期vscode的调试器做准备)
+2019/6/12
+升级版本0.9.279.3
+顶层包的命令加载模式改为在vscode终端中使用下面的命令自动注册
+pye.regist(pytest)
+该命令会在pytest包的__init__.py文件中自动注册包中能搜索到的command/lisp/panel
+支持浩辰CAD、Accoreconsole
+添加pyrun命令运行py脚本
+2019/11/24
+升级版本0.9.279.4
+顶层包的命令加载模式改为在vscode终端中使用下面的命令自动注册
+pye.registall()
+2019/12/1
+升级版本0.9.279.5
+添加PYREFERENCE命令生成智能感知文件
+2019/12/12
+升级版本0.9.279.6
+智能感知文件基本完成，某些泛型相关类有少许问题
+取消原有的命令自动注册，改为pyrb命令注册并编译
+pycad.runtime模块添加edx模块,支持类lisp_ssget的选择集操作函数
+注释了大部分例程
+2019/12/16
+修正版本0.9.279.6b
+修正扩展函数、泛型类的解析
+保存数据文件为压缩档
+智能感知文件暂时只收录下列类库:
+System.dll/mscorlib.dll/System.Core.dll
+acdbmgd.dll/accoremgd.dll/acmgd.dll
+其他类库请自行在Cad中键入PYREFERENCE命令生成
+2019/12/20
+修正版本0.9.279.6c
+再次修正泛型类的解析，智能感知能正常解析索引函数
+修改edx的调用方式，见pytest模块例程
+edx模块添加getxxx函数、sssetfirst/ssgetfirst函数
+修改了一些bug
+2019/12/30
+修正版本0.9.279.6d
+修改了一些pycad/pytest模块的bug
+2020/1/13
+升级版本0.9.279.7
+修改py项目的组织形式,原项目组织形式为包，不能防止同名包覆盖的问题
+新的项目组织形式与国际接轨, 根目录可随意命名, 保证目录下有个extension包即可, 该包不可重命名, 不可缺失
+项目的data目录可放置数据文件，程序中可使用findfile(filename)获取文件路径
+项目的cuix目录可放置Cad的cuix文件用于加载定制的菜单、工具条和Ribbon菜单
+重写了发布功能, 命令pyrelease, 可选择多项目一起发布, 完成后会在temp目录下生成一个自解压安装包xxx.Setup.dll
+可以在未安装Pycad的机器上运行netload命令加载dll来安装Pycad的运行版本和开发的项目
+pye命令名修改为pyedit
+2020/1/19
+测试版本1.0.279.0a
+调试器C#版本框架基本完成,提供测试
+调试流程: 打开Cad->打开pytest项目->按下F5->在Cad中敲命令即可进入调试模式
+退出调试只需要点vscode中的断开连接按钮
+2020/1/22
+正式版本1.0.279.0
+调试器完成。

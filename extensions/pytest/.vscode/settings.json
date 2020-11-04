@@ -1,5 +1,4 @@
 {
-    "python.pythonPath": "C:\\Program Files\\Python37",
     "python.autoComplete.extraPaths": ["..\\.stubs\\pycadsys", "..\\.stubs\\clrclasses"],
     "python.linting.pylintEnabled": false,
     "python.linting.flake8Enabled": true,

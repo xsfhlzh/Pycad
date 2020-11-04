@@ -289,29 +289,30 @@ namespace NFox.Pycad
         #endregion
 
         #region Build
-        
-        public void Release(IEnumerable<Extension> extensions)
+
+        public Stream GetReleaseStream(IEnumerable<Extension> extensions)
         {
-            string path = $"{DirectoryEx.Temp.FullName}\\Release.zip";
-            using (var target = new FileStream(path, FileMode.Create))
+            //读取package.xml打包信息将程序文件和插件压缩写入内存流
+            var target = new MemoryStream();
+            using (var zip = new ZipArchive(target, ZipArchiveMode.Update, true))
             {
-                using (var zip = new ZipArchive(target, ZipArchiveMode.Update))
+                using (var stream = zip.CreateEntry("Version").Open())
+                using (var sw = new StreamWriter(stream))
+                    sw.Write($"{Utils.GetVariable<string>("version")}");
+                XElement xe = XElement.Load(DirectoryEx.Bin.GetFile("package.xml").FullName);
+                CopyFiles(xe, DirectoryEx.Root, zip);
+                foreach (var e in extensions)
                 {
-                    using (var stream = zip.CreateEntry("Version").Open())
-                    using (var sw = new StreamWriter(stream))
-                        sw.Write($"{Utils.GetVariable<string>("version")}");
-                    XElement xe = XElement.Load(DirectoryEx.Bin.GetFile("package.xml").FullName);
-                    CopyFiles(xe, DirectoryEx.Root, zip);
-                    foreach (var e in extensions)
+                    if (e.Name != "pycad")
                     {
-                        if (e.Name != "pycad")
-                        {
-                            using (var stream = zip.CreateEntry($"extensions\\{e.Name}").Open())
-                                e.Build(stream);
-                        }
+                        using (var stream = zip.CreateEntry($"extensions\\{e.Name}").Open())
+                            e.Build(stream);
                     }
                 }
             }
+            target.Flush();
+            target.Seek(0, SeekOrigin.Begin);
+            return target;
         }
 
         private void CopyFiles(XElement xe, DirectoryInfo dir, ZipArchive zip)

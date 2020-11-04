@@ -2,31 +2,32 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace NFox.Pycad
 {
     public class AcadVersion: VersionBase
     {
 
-        const string _pattern = @"Autodesk\\AutoCAD\\R(\d+)\.(\d+)\\.*?";
+        const string _pattern = @"AutoCAD\\R(\d+)\.(\d+)\\.*?";
 
         private AcadVersion(string rootkey)
         {
             //从注册表获取版本信息
             var gs = Regex.Match(rootkey, _pattern).Groups;
-            ProductRootKey = rootkey;
+            ProductRootKey = "Software\\" + rootkey;
             Major = int.Parse(gs[1].Value);
             Minor = int.Parse(gs[2].Value);
-            var rk =
-                Registry
-                .LocalMachine
-                .OpenSubKey("SOFTWARE")
-                .OpenSubKey(rootkey);
-            ProductName = rk.GetValue("ProductName").ToString();
-            var gs2 = Regex.Match(ProductName, "AutoCAD (\\d+)");
-            if (gs2.Success) Number = int.Parse(gs2.Groups[1].Value);
-            Location = rk.GetValue("Location").ToString();
-            rk.Close();
+            using (var rk = Registry.LocalMachine.OpenSubKey(ProductRootKey))
+            {
+                var path = rk.GetValue("ProductNameGlob").ToString();
+                var gs2 = Regex.Match(path, "AutoCAD (\\d+)");
+                if (gs2.Success)
+                {
+                    Number = int.Parse(gs2.Groups[1].Value);
+                    ProductName = gs2.Groups[0].Value;
+                }
+            }
         }
 
         private static List<VersionBase> _versions;
@@ -39,19 +40,21 @@ namespace NFox.Pycad
                     _versions = new List<VersionBase>();
                     try
                     {
-                        string[] copys =
-                           Registry
-                           .LocalMachine
-                           .OpenSubKey(@"SOFTWARE\Autodesk\Hardcopy")
-                           .GetValueNames();
-                        foreach (var rootkey in copys)
+                        using (var acadkey = Registry.LocalMachine.OpenSubKey("Software\\Autodesk\\Hardcopy"))
                         {
-                            try
+                            var copys =
+                                acadkey
+                                .GetSubKeyNames()
+                                .Select(name => acadkey.OpenSubKey(name));
+                            foreach (var name in acadkey.GetValueNames())
                             {
-                                if (Regex.IsMatch(rootkey, _pattern))
-                                    _versions.Add(new AcadVersion(rootkey));
+                                try
+                                {
+                                    if (Regex.IsMatch(name, _pattern))
+                                        _versions.Add(new AcadVersion(name));
+                                }
+                                catch { }
                             }
-                            catch { }
                         }
                     }
                     catch { }
@@ -67,62 +70,50 @@ namespace NFox.Pycad
 
             try
             {
-                var rootkey =
-                    Registry
-                    .CurrentUser
-                    .OpenSubKey("SOFTWARE")
-                    .OpenSubKey(ProductRootKey, true);
-                RegistryKey appskey = rootkey.CreateSubKey("Applications");
 
                 //注册预加载程序集
-                RegistryKey rk = appskey.OpenSubKey(info.Name, true);
-                if (rk == null)
+                using (var rootkey = Registry.CurrentUser.OpenSubKey(ProductRootKey))
+                using (var appskey = rootkey.CreateSubKey("Applications"))
+                using (var rk = appskey.CreateSubKey(info.Name))
                 {
-                    rk = appskey.CreateSubKey(info.Name);
                     rk.SetValue("DESCRIPTION", info.Description, RegistryValueKind.String);
                     rk.SetValue("LOADER", info.Location, RegistryValueKind.String);
                     rk.SetValue("LOADCTRLS", info.LoadType, RegistryValueKind.DWord);
                     rk.SetValue("MANAGED", 1, RegistryValueKind.DWord);
-                }
-                else if (rk.GetValue("LOADER").ToString() != info.Location)
-                {
-                    rk.SetValue("LOADER", info.Location, RegistryValueKind.String);
-                }
 
-                rk.Close();
-                appskey.Close();
 
-                try
-                {
-                    //添加信任目录
-                    var profileskey = rootkey.OpenSubKey("Profiles");
-                    foreach (string keyname in profileskey.GetSubKeyNames())
+                    try
                     {
-                        var profilekey = profileskey.OpenSubKey(keyname);
-                        var variableskey = profilekey?.OpenSubKey("Variables", true);
-                        string paths = variableskey?.GetValue("TRUSTEDPATHS")?.ToString();
-                        if (paths != null)
+                        //添加信任目录
+                        using (var profileskey = rootkey.OpenSubKey("Profiles"))
                         {
-                            List<string> names = new List<string>();
-                            if (paths != "")
+                            foreach (string keyname in profileskey.GetSubKeyNames())
                             {
-                                foreach (string s in paths.Split(';'))
-                                    names.Add(s.ToLower());
-                            }
-                            string path = Path.GetDirectoryName(info.Location);
-                            if (!names.Contains(path.ToLower()))
-                            {
-                                names.Add(path);
-                                variableskey.SetValue("TRUSTEDPATHS", string.Join(";", names));
+                                using (var profilekey = profileskey.OpenSubKey(keyname))
+                                using (var variableskey = profilekey?.OpenSubKey("Variables", true))
+                                {
+                                    string paths = variableskey?.GetValue("TRUSTEDPATHS")?.ToString();
+                                    if (paths != null)
+                                    {
+                                        List<string> names = new List<string>();
+                                        if (paths != "")
+                                        {
+                                            foreach (string s in paths.Split(';'))
+                                                names.Add(s.ToLower());
+                                        }
+                                        string path = Path.GetDirectoryName(info.Location);
+                                        if (!names.Contains(path.ToLower()))
+                                        {
+                                            names.Add(path);
+                                            variableskey.SetValue("TRUSTEDPATHS", string.Join(";", names));
+                                        }
+                                    }
+                                }
                             }
                         }
-                        variableskey.Close();
-                        profilekey.Close();
                     }
-                    profileskey.Close();
-                    rootkey.Close();
+                    catch { }
                 }
-                catch { }
             }
             catch { }
 
