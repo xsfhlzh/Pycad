@@ -14,8 +14,6 @@ namespace NFox.Pycad.Update
             //保证下次从主目录启动
             VersionBase.RegApp();
 
-
-
             //更新其他的文件
             var file = DirectoryEx.Update.GetFile("package.xml");
             if (file != null)

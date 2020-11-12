@@ -143,7 +143,7 @@
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(236, 23);
             this.textBox1.TabIndex = 1;
-            this.textBox1.Text = "C:\\Program Files\\Pycad\r\n";
+            this.textBox1.Text = "C:\\Pycad\r\n";
             // 
             // label2
             // 
@@ -165,6 +165,7 @@
             this.btnSelRoot.Text = "…";
             this.btnSelRoot.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.btnSelRoot.UseVisualStyleBackColor = true;
+            this.btnSelRoot.Click += new System.EventHandler(this.btnSelRoot_Click);
             // 
             // tableLayoutPanel4
             // 

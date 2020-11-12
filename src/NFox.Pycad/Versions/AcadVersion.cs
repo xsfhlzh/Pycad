@@ -72,7 +72,7 @@ namespace NFox.Pycad
             {
 
                 //注册预加载程序集
-                using (var rootkey = Registry.CurrentUser.OpenSubKey(ProductRootKey))
+                using (var rootkey = Registry.CurrentUser.OpenSubKey(ProductRootKey, true))
                 using (var appskey = rootkey.CreateSubKey("Applications"))
                 using (var rk = appskey.CreateSubKey(info.Name))
                 {

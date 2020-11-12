@@ -1,0 +1,87 @@
+{
+  "commands": {
+    ".cmds.entity": {
+      "helloworld": "",
+      "mtexttest": "",
+      "mtexttest2": "",
+      "randtest": "",
+      "mycir": "",
+      "mycir2": "",
+      "mycir3": "",
+      "myline": "",
+      "myline2": "",
+      "mypl3d": ""
+    },
+    ".cmds.form": {
+      "mymsg": "",
+      "showwpf": "",
+      "showfrm": ""
+    },
+    ".cmds.gecurve": {
+      "ccitest": "",
+      "ccitest2": "",
+      "mindict": "",
+      "comptest": "",
+      "linetest": ""
+    },
+    ".cmds.jig": {
+      "testblockjig": "",
+      "testcirjig": "",
+      "xhqtest": ""
+    },
+    ".cmds.linq": {
+      "linqtest": "flags=acrx.CommandFlags.UsePickSet",
+      "linqtest2": ""
+    },
+    ".cmds.runtime": {
+      "cstest": "",
+      "switchtotest": "lock=False",
+      "cmdtest": "",
+      "dbxtest": "",
+      "showpickfirstinfo": "",
+      "unshowpickfirstinfo": "",
+      "runarx": "",
+      "runlisp": "flags=acrx.CommandFlags.Session",
+      "zoomtest": ""
+    },
+    ".cmds.selection": {
+      "comtest": "flags=acrx.CommandFlags.UsePickSet",
+      "myss1": "",
+      "myss2": "",
+      "myss3": "",
+      "myss4": ""
+    },
+    ".cmds.sort": {
+      "pysort": "",
+      "linqsort": ""
+    },
+    ".cmds.symboltable": {
+      "dicttest": "",
+      "dicttest2": "",
+      "dicttest3": "",
+      "layertest": "",
+      "clayertest": ""
+    },
+    ".cmds.xdata": {
+      "myxdata": "",
+      "myxdata2": "",
+      "deserializetest": ""
+    }
+  },
+  "lisps": {
+    ".lisps": {
+      "mylisp": "",
+      "mylisp0": "",
+      "mylisp1": "",
+      "mylisp2": "",
+      "mylisp3": "",
+      "mylisp4": "",
+      "clipboard": ""
+    }
+  },
+  "panels": {
+    ".panels": {
+      "showpanel": "'testpanel'"
+    }
+  }
+}

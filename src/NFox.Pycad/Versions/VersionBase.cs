@@ -22,6 +22,8 @@ namespace NFox.Pycad
 
         public string Location { get; protected set; }
 
+        public bool Selected { get; set; }
+
         public abstract void RegApp(string name, string location, string desc);
 
         public static void RegApp(DirectoryInfo root = null)
@@ -39,7 +41,7 @@ namespace NFox.Pycad
                 if (ver.Number >= 2012)
                     ver.RegApp(
                         "NFox.Pycad",
-                        root.GetFile("NFox.Pycad.Acad.dll").FullName,
+                        root.GetFileFullName("NFox.Pycad.Acad.dll"),
                         "NFox Pycad Loader");
 
             }
@@ -50,7 +52,7 @@ namespace NFox.Pycad
 
                 ver.RegApp(
                     "NFox.Pycad",
-                    root.GetFile("NFox.Pycad.Gcad.dll").FullName,
+                    root.GetFileFullName("NFox.Pycad.Gcad.dll"),
                     "NFox Pycad Loader");
 
             }

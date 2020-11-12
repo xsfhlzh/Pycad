@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using System.Linq;
 using System.Xml.Linq;
 using System.Reflection;
+using System.Security.AccessControl;
 
 namespace NFox.Pycad.Setup
 {
@@ -14,19 +15,20 @@ namespace NFox.Pycad.Setup
     {
 
         ZipArchive _zip;
-        Version _ver;
+        Version _ver = new Version();
         string _rootpath;
         string _updatepath;
         DirectoryInfo _rootdir;
         DirectoryInfo _maindir;
 
         bool _setuped = false;
+        Assembly _ass;
 
         public frmSetup()
         {
 
             InitializeComponent();
-
+            
             using (RegistryKey pycadkey = Registry.CurrentUser.CreateSubKey("Software\\NFox\\Pycad"))
             {
                 _rootpath = pycadkey.GetValue("MainPath")?.ToString();
@@ -34,51 +36,63 @@ namespace NFox.Pycad.Setup
                 catch { }
             }
 
-            _setuped = true;
-            if (_rootpath != null && Directory.Exists(_rootpath))
+            if (_setuped = _rootpath != null && Directory.Exists(_rootpath))
             {
-                _setuped = false;
                 textBox1.Text = _rootpath;
                 textBox1.Enabled = label2.Enabled = btnSelRoot.Enabled = false;
             }
-
-            var num = Math.Max(AcadVersion.Versions.Count, GcadVersion.Versions.Count);
-            tableLayoutPanel4.ColumnCount = num;
-            int i = 0;
-            for (; i < num - 1; i++)
-                tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-
-            Height += num * 30;
-
-            i = 0;
-            foreach (var verobj in AcadVersion.Versions)
+            else
             {
-                var chkbox =
-                    new CheckBox
-                    {
-                        Text = verobj.ProductName,
-                        Checked = verobj.Selected = true,
-                        Tag = verobj
-                    };
-                tableLayoutPanel4.Controls.Add(chkbox, 0, i++);
-            }
-
-            i = 0;
-            foreach (var verobj in GcadVersion.Versions)
-            {
-                var chkbox =
-                    new CheckBox
-                    {
-                        Text = verobj.ProductName,
-                        Checked = true,
-                        Tag = verobj
-                    };
-                tableLayoutPanel4.Controls.Add(chkbox, 1, i++);
+                _rootpath = textBox1.Text.Trim();
             }
 
             using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Release"))
             using (var zip = new ZipArchive(stream, ZipArchiveMode.Read))
             {
+
+                using (var zs = zip.GetEntry("NFox.Pycad.dll").Open())
+                using (var ms = new MemoryStream())
+                {
+                    zs.CopyTo(ms);
+                    _ass = Assembly.Load(ms.ToArray());
+                    dynamic avers = GetVersions(_ass.GetType("NFox.Pycad.AcadVersion"));
+                    dynamic gvers = GetVersions(_ass.GetType("NFox.Pycad.GcadVersion"));
+
+                    var num = Math.Max(avers.Count, gvers.Count);
+                    tableLayoutPanel4.ColumnCount = num;
+                    int i = 0;
+                    for (; i < num - 1; i++)
+                        tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+
+                    Height += num * 30;
+
+                    i = 0;
+                    foreach (var verobj in avers)
+                    {
+                        var chkbox =
+                            new CheckBox
+                            {
+                                Text = verobj.ProductName,
+                                Checked = verobj.Selected = true,
+                                Tag = verobj
+                            };
+                        tableLayoutPanel4.Controls.Add(chkbox, 0, i++);
+                    }
+
+                    i = 0;
+                    foreach (var verobj in gvers)
+                    {
+                        var chkbox =
+                            new CheckBox
+                            {
+                                Text = verobj.ProductName,
+                                Checked = true,
+                                Tag = verobj
+                            };
+                        tableLayoutPanel4.Controls.Add(chkbox, 1, i++);
+                    }
+
+                }
                 var ents =
                     zip
                     .Entries
@@ -89,7 +103,13 @@ namespace NFox.Pycad.Setup
 
         }
 
-        private void AddVersionCheckBox(VersionBase verobj, int col, int row)
+        private dynamic GetVersions(Type type)
+        {
+            var versprops = type.GetProperty("Versions", BindingFlags.FlattenHierarchy | BindingFlags.Static | BindingFlags.Public);
+            return versprops.GetValue(null, null);
+        }
+
+        private void AddVersionCheckBox(dynamic verobj, int col, int row)
         {
             var chkbox =
                 new CheckBox
@@ -102,7 +122,7 @@ namespace NFox.Pycad.Setup
                 (s, e) =>
                 {
                     var c = (CheckBox)s;
-                    var v = (VersionBase)c.Tag;
+                    dynamic v = c.Tag;
                     v.Selected = c.Checked;
                 };
             tableLayoutPanel4.Controls.Add(chkbox, col, row);
@@ -126,6 +146,7 @@ namespace NFox.Pycad.Setup
                 {
 
                     var newver = Version.Parse(sr.ReadToEnd());
+                    _updatepath = Path.Combine(_rootpath, "update");
 
                     if (!_setuped)
                         Directory.CreateDirectory(_rootpath);
@@ -133,9 +154,10 @@ namespace NFox.Pycad.Setup
                     if (!_setuped || newver > _ver)
                     {
                         _rootdir = new DirectoryInfo(_rootpath);
-                        _updatepath = Path.Combine(_rootpath, "update");
+
+                        
                         if(!Directory.Exists(_updatepath))
-                            Directory.CreateDirectory(_updatepath);
+                            _rootdir.CreateSubdirectory("update");
                         _maindir = _rootdir.CreateSubdirectory("main");
                         using (RegistryKey pycadkey = Registry.CurrentUser.CreateSubKey("Software\\NFox\\Pycad"))
                         {
@@ -143,13 +165,15 @@ namespace NFox.Pycad.Setup
                             pycadkey.SetValue("Version", newver.ToString());
                         }
                         bool inUse = IsFileInUse(Path.Combine(_rootpath, "NFox.Pycad.dll"));
-                        VersionBase.RegApp(inUse ? _maindir.FullName : _rootpath);
+                        var vtype = _ass.GetType("NFox.Pycad.VersionBase");
+                        var mi = vtype.GetMethod("RegApp", BindingFlags.Public | BindingFlags.Static);
+                        mi.Invoke(null, new object[1] { inUse ? _maindir : _rootdir });
                         using (var pstream = _zip.GetEntry("package.xml").Open())
                             UpdateFiles(XElement.Load(pstream), new DirectoryInfo(_rootpath), inUse);
                     }
 
                     //将插件拷贝到更新子目录
-                    foreach (var ent in _zip.Entries.Where(ee => ee.FullName.StartsWith("extensions")))
+                    foreach (var ent in _zip.Entries.Where(ee => ee.FullName.StartsWith("extensions\\")))
                         CopyTo(ent.Open(), Path.Combine(_updatepath, ent.FullName));
 
                     MessageBox.Show("安装完毕！");
@@ -180,7 +204,10 @@ namespace NFox.Pycad.Setup
                         break;
                     case "Module":
                         var dllname = name + ".dll";
-                        CopyTo(dllname, Path.Combine(_updatepath, dllname));
+                        if (inUse)
+                            CopyTo(dllname, Path.Combine(_updatepath, dllname));
+                        else
+                            CopyTo(dllname, Path.Combine(dir.FullName, dllname));
                         break;
                     case "Plugin":
                         if (inUse)
@@ -189,10 +216,10 @@ namespace NFox.Pycad.Setup
                             Unzip(name, dir.CreateSubdirectory(name));
                         break;
                     case "File":
-                        if(inUse && dir == _rootdir)
-                            CopyTo(name, Path.Combine(_maindir.FullName, name));
+                        if (inUse)
+                            CopyTo(name, Path.Combine(dir == _rootdir ? _maindir.FullName : _updatepath, name));
                         else
-                            CopyTo(name, Path.Combine(_updatepath, name));
+                            CopyTo(name, Path.Combine(dir.FullName, name));
                         break;
                 }
             }
@@ -228,20 +255,34 @@ namespace NFox.Pycad.Setup
 
         private static bool IsFileInUse(string fileName)
         {
-            bool inUse = true;
             FileStream fs = null;
             try
             {
+                if (!File.Exists(fileName))
+                    return false;
                 fs = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.None);
-                inUse = false;
             }
-            catch { }
+            catch
+            {
+                return true;
+            }
             finally
             {
                 if (fs != null)
                     fs.Close();
             }
-            return inUse;
+            return false;
+        }
+
+        private void btnSelRoot_Click(object sender, EventArgs e)
+        {
+            FolderBrowserDialog dialog = new FolderBrowserDialog();
+            dialog.Description = "请选择安装路径";
+            dialog.RootFolder =  Environment.SpecialFolder.ProgramFiles;
+            DialogResult result = dialog.ShowDialog();
+            if (result == DialogResult.Cancel)
+                return;
+            _rootpath = textBox1.Text = dialog.SelectedPath.Trim();
         }
 
     }

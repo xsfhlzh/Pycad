@@ -1,0 +1,5 @@
+D:\Pycad\Bin\NFox.Pycad.Console.exe
+D:\Pycad\Bin\NFox.Pycad.Console.pdb
+D:\Pycad\src\NFox.Pycad.Console\obj\Debug\NFox.Pycad.Console.csproj.CoreCompileInputs.cache
+D:\Pycad\src\NFox.Pycad.Console\obj\Debug\NFox.Pycad.Console.exe
+D:\Pycad\src\NFox.Pycad.Console\obj\Debug\NFox.Pycad.Console.pdb

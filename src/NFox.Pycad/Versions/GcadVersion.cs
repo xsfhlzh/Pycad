@@ -4,12 +4,12 @@ using System.Text.RegularExpressions;
 
 namespace NFox.Pycad
 {
-    public class GcadVersion: VersionBase
+    public class GcadVersion : VersionBase
     {
 
         private GcadVersion(string rootkey)
         {
-            ProductRootKey = $@"SOFTWARE\Gstarsoft\GstarCAD\{rootkey}\zh-CN";
+            ProductRootKey = rootkey;
             using (var rk = Registry.CurrentUser.OpenSubKey(ProductRootKey))
             {
                 ProductName = rk.GetValue("ProductName").ToString();
@@ -31,15 +31,20 @@ namespace NFox.Pycad
                     _versions = new List<VersionBase>();
                     try
                     {
-                        string[] copys =
-                           Registry
-                           .CurrentUser
-                           .OpenSubKey(@"SOFTWARE\Gstarsoft\GstarCAD")
-                           .GetSubKeyNames();
-                        foreach (var rootkey in copys)
+
+                        using (var gcadkey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Gstarsoft\GstarCAD"))
                         {
-                            try { _versions.Add(new GcadVersion(rootkey)); }
-                            catch { }
+                            foreach (var rootkey in gcadkey.GetSubKeyNames())
+                            {
+                                using (var pkey = gcadkey.OpenSubKey(rootkey + @"\zh-CN"))
+                                {
+                                    if (pkey.GetValue("ProductName") != null)
+                                    {
+                                        try { _versions.Add(new GcadVersion($@"SOFTWARE\Gstarsoft\GstarCAD\{rootkey}\zh-CN")); }
+                                        catch { }
+                                    }
+                                }
+                            }
                         }
                     }
                     catch { }
@@ -51,9 +56,9 @@ namespace NFox.Pycad
         public override void RegApp(string name, string location, string desc)
         {
             var info = new AssemInfo(name, location, desc);
-            //注册预加载程序集
             try
             {
+                //注册预加载程序集
                 using (var rootkey = Registry.CurrentUser.OpenSubKey(ProductRootKey, true))
                 using (var appskey = rootkey.CreateSubKey("Applications"))
                 using (var rk = appskey.CreateSubKey(info.Name))

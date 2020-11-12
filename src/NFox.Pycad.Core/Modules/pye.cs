@@ -212,7 +212,10 @@ namespace NFox.Pycad.Core.Modules
             //修改安装程序,将包含主程序文件和插件的压缩流写入最终安装程序的资源
             var definition = AssemblyDefinition.ReadAssembly(DirectoryEx.Bin.GetFileFullName("NFox.Pycad.Setup.exe"));
             using (var rstream = Engine.Instance.GetReleaseStream(exts))
+            using(var fs = File.Create(DirectoryEx.Bin.GetFileFullName("Release.zip")))
             {
+                rstream.CopyTo(fs);
+                rstream.Seek(0, SeekOrigin.Begin);
                 var er = new EmbeddedResource("Release", ManifestResourceAttributes.Public, rstream);
                 definition.MainModule.Resources.Add(er);
                 definition.Write(DirectoryEx.Temp.GetFileFullName(name));

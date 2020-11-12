@@ -1,0 +1,7 @@
+D:\Pycad\Plugins\NFox.Pycad.Update\settings.xml
+D:\Pycad\Plugins\NFox.Pycad.Update\NFox.Pycad.Update.dll
+D:\Pycad\Plugins\NFox.Pycad.Update\NFox.Pycad.Update.pdb
+D:\Pycad\src\NFox.Pycad.Update\obj\Debug\NFox.Pycad.Update.csproj.CoreCompileInputs.cache
+D:\Pycad\src\NFox.Pycad.Update\obj\Debug\NFox.Pycad.Update.dll
+D:\Pycad\src\NFox.Pycad.Update\obj\Debug\NFox.Pycad.Update.pdb
+D:\Pycad\src\NFox.Pycad.Update\obj\Debug\NFox.Pycad.Update.csprojAssemblyReference.cache

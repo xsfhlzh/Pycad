@@ -1,0 +1,6 @@
+D:\Pycad\Bin\NFox.Pycad.Runtime.dll
+D:\Pycad\Bin\NFox.Pycad.Runtime.pdb
+D:\Pycad\src\NFox.Pycad.Runtime\obj\Debug\NFox.Pycad.Runtime.csproj.CoreCompileInputs.cache
+D:\Pycad\src\NFox.Pycad.Runtime\obj\Debug\NFox.Pycad.Runtime.dll
+D:\Pycad\src\NFox.Pycad.Runtime\obj\Debug\NFox.Pycad.Runtime.pdb
+D:\Pycad\src\NFox.Pycad.Runtime\obj\Debug\NFox.Pycad.Runtime.csprojAssemblyReference.cache
