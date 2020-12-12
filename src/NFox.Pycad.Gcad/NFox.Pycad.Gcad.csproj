@@ -39,11 +39,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="gmap">
-      <HintPath>C:\Program Files\浩辰软件\浩辰CAD2020\gmap.dll</HintPath>
+      <HintPath>..\Cad.NetRefences\gmap.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="gmdb">
-      <HintPath>C:\Program Files\浩辰软件\浩辰CAD2020\gmdb.dll</HintPath>
+      <HintPath>..\Cad.NetRefences\gmdb.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />

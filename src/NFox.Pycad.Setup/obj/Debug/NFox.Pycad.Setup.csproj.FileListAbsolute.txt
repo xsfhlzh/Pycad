@@ -3,6 +3,6 @@ D:\Pycad\Bin\NFox.Pycad.Setup.pdb
 D:\Pycad\src\NFox.Pycad.Setup\obj\Debug\NFox.Pycad.Setup.frmSetup.resources
 D:\Pycad\src\NFox.Pycad.Setup\obj\Debug\NFox.Pycad.Setup.Properties.Resources.resources
 D:\Pycad\src\NFox.Pycad.Setup\obj\Debug\NFox.Pycad.Setup.csproj.GenerateResource.cache
-D:\Pycad\src\NFox.Pycad.Setup\obj\Debug\NFox.Pycad.Setup.csproj.CoreCompileInputs.cache
 D:\Pycad\src\NFox.Pycad.Setup\obj\Debug\NFox.Pycad.Setup.exe
 D:\Pycad\src\NFox.Pycad.Setup\obj\Debug\NFox.Pycad.Setup.pdb
+D:\Pycad\src\NFox.Pycad.Setup\obj\Debug\NFox.Pycad.Setup.csprojResolveAssemblyReference.cache

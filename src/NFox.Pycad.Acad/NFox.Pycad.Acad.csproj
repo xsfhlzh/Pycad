@@ -36,7 +36,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="acdbmgd">
-      <HintPath>C:\Program Files\Autodesk\AutoCAD 2016\acdbmgd.dll</HintPath>
+      <HintPath>..\Cad.NetRefences\acdbmgd.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />

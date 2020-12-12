@@ -1,6 +1,5 @@
 D:\Pycad\extensions\parts\data\NFox.Expression.dll
 D:\Pycad\extensions\parts\data\NFox.Expression.pdb
-D:\Pycad\src\NFox.Expression\obj\Debug\NFox.Expression.csprojAssemblyReference.cache
 D:\Pycad\src\NFox.Expression\obj\Debug\NFox.Expression.Runtime.frmInputBox.resources
 D:\Pycad\src\NFox.Expression\obj\Debug\NFox.Expression.Runtime.frmMakeGeneralPart.resources
 D:\Pycad\src\NFox.Expression\obj\Debug\NFox.Expression.Runtime.frmMakeParameterizedPart.resources
@@ -18,6 +17,6 @@ D:\Pycad\src\NFox.Expression\obj\Debug\NFox.Expression.Runtime.PartListView.reso
 D:\Pycad\src\NFox.Expression\obj\Debug\NFox.Expression.Runtime.PartPropertyList.resources
 D:\Pycad\src\NFox.Expression\obj\Debug\NFox.Expression.Properties.Resources.resources
 D:\Pycad\src\NFox.Expression\obj\Debug\NFox.Expression.csproj.GenerateResource.cache
-D:\Pycad\src\NFox.Expression\obj\Debug\NFox.Expression.csproj.CoreCompileInputs.cache
 D:\Pycad\src\NFox.Expression\obj\Debug\NFox.Expression.dll
 D:\Pycad\src\NFox.Expression\obj\Debug\NFox.Expression.pdb
+D:\Pycad\src\NFox.Expression\obj\Debug\NFox.Expression.csprojResolveAssemblyReference.cache

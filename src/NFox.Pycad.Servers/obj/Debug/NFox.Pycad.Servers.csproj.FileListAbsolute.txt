@@ -1,8 +1,6 @@
 D:\Pycad\Plugins\NFox.Pycad.Servers\settings.xml
 D:\Pycad\Plugins\NFox.Pycad.Servers\NFox.Pycad.Servers.dll
 D:\Pycad\Plugins\NFox.Pycad.Servers\NFox.Pycad.Servers.pdb
-D:\Pycad\src\NFox.Pycad.Servers\obj\Debug\NFox.Pycad.Servers.csprojAssemblyReference.cache
-D:\Pycad\src\NFox.Pycad.Servers\obj\Debug\NFox.Pycad.Servers.csproj.CoreCompileInputs.cache
-D:\Pycad\src\NFox.Pycad.Servers\obj\Debug\NFox.Pycad.Servers.csproj.CopyComplete
 D:\Pycad\src\NFox.Pycad.Servers\obj\Debug\NFox.Pycad.Servers.dll
 D:\Pycad\src\NFox.Pycad.Servers\obj\Debug\NFox.Pycad.Servers.pdb
+D:\Pycad\src\NFox.Pycad.Servers\obj\Debug\NFox.Pycad.Servers.csprojResolveAssemblyReference.cache
