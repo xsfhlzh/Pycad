@@ -20,7 +20,7 @@ namespace NFox.Pycad
             Minor = int.Parse(gs[2].Value);
             using (var rk = Registry.LocalMachine.OpenSubKey(ProductRootKey))
             {
-                var path = rk.GetValue("ProductNameGlob").ToString();
+                var path = rk.GetValue("ProductName").ToString();
                 var gs2 = Regex.Match(path, "AutoCAD (\\d+)");
                 if (gs2.Success)
                 {

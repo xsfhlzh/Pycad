@@ -14,6 +14,8 @@ from System.Drawing import Point
 from System.Windows.Controls import UserControl
 import wpf
 
+from pycad.system import *
+from pycad.runtime import *
 
 class WpfTestForm(Form):
     def __init__(self):
@@ -38,3 +40,10 @@ class UCWpfTestForm(UserControl):
         utils.setvalue('WpfTestForm', self.InputTb.Text)
 
 
+    def Input_Button_Click2(self, sender, e):
+        doc = acapp.DocumentManager.MdiActiveDocument
+        if doc:
+            with doc.LockDocument():
+                with dbtrans(doc) as tr:
+                    btr = tr.opencurrspace()
+                    tr.addentity(btr, acdb.Line(acge.Point3d(0,0,0), acge.Point3d(10,10,0)))
